@@ -1,12 +1,13 @@
 import {
     Menu,
     Moon,
+    Sun,
 } from "lucide-react";
 import { useTheme } from "../../context/ThemeContext";
 import GlobalSearch from "../../components/dashboard/GlobalSearch";
 
 function DashboardHeader({ setIsSidebarOpen }) {
-    const { toggleTheme } = useTheme();
+    const { theme, toggleTheme } = useTheme();
 
     const user = JSON.parse(localStorage.getItem("user"));
 
@@ -62,7 +63,11 @@ function DashboardHeader({ setIsSidebarOpen }) {
                     "
                     aria-label="Toggle dark mode"
                 >
-                    <Moon className="h-5 w-5" />
+                    {theme === "dark" ? (
+    <Sun className="h-5 w-5" />
+) : (
+    <Moon className="h-5 w-5" />
+)}
                 </button>
 
                 {/* Avatar */}
