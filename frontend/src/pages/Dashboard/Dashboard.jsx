@@ -8,6 +8,8 @@ import DashboardStats from "../../components/dashboard/DashboardStats";
 import DashboardRecentActivity from "../../components/dashboard/DashboardRecentActivity";
 import DashboardQuickActions from "../../components/dashboard/DashboardQuickActions";
 import DeadlinePopup from "../../components/dashboard/DeadlinePopup";
+import StudyAgent from "../../components/dashboard/StudyAgent";
+import DashboardChart from "../../components/dashboard/DashboardChart";
 
 function Dashboard() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -15,18 +17,18 @@ function Dashboard() {
     const [deadlineReminders, setDeadlineReminders] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
-    
-const [deadlineNotificationsEnabled, setDeadlineNotificationsEnabled] = useState(() => {
-    return localStorage.getItem("deadlineNotifications") !== "false";
-});
 
-useEffect(() => {
-    fetchDashboard();
+    const [deadlineNotificationsEnabled, setDeadlineNotificationsEnabled] = useState(() => {
+        return localStorage.getItem("deadlineNotifications") !== "false";
+    });
 
-    if (deadlineNotificationsEnabled) {
-        fetchDeadlineReminders();
-    }
-}, [deadlineNotificationsEnabled]);
+    useEffect(() => {
+        fetchDashboard();
+
+        if (deadlineNotificationsEnabled) {
+            fetchDeadlineReminders();
+        }
+    }, [deadlineNotificationsEnabled]);
 
     const fetchDashboard = async () => {
         try {
@@ -65,12 +67,12 @@ useEffect(() => {
         return today.toISOString().split("T")[0];
     };
 
-const fetchDeadlineReminders = async () => {
-    try {
-        if (localStorage.getItem("deadlineNotifications") === "false") {
-            setDeadlineReminders([]);
-            return;
-        }
+    const fetchDeadlineReminders = async () => {
+        try {
+            if (localStorage.getItem("deadlineNotifications") === "false") {
+                setDeadlineReminders([]);
+                return;
+            }
             const todayKey = `deadlinePopupDismissed_${getTodayKey()}`;
 
             if (sessionStorage.getItem(todayKey) === "true") {
@@ -173,25 +175,27 @@ const fetchDeadlineReminders = async () => {
             />
 
             {/* Main Dashboard */}
-            <main className="min-h-screen px-4 pb-6 pt-20 sm:px-6 lg:pl-68 lg:pt-20">
+            <main className="workspace-content min-h-screen">
                 <div className="mx-auto max-w-7xl space-y-6">
                     {/* Welcome + Stats */}
                     <DashboardWelcome />
 
-                    <DashboardStats dashboardData={dashboardData} />
+                    <DashboardStats
+                        dashboardData={dashboardData}
+                    />
 
-                    {/* Recent Activity + Quick Actions */}
-                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                        <div>
-                            <DashboardRecentActivity
-                                dashboardData={dashboardData}
-                            />
-                        </div>
+                    {/* Recent Activity and Quick Actions */}
+{/* AI Study Planner and Task Progress */}
+<div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+    <StudyAgent />
+    <DashboardChart dashboardData={dashboardData} />
+</div>
 
-                        <div>
-                            <DashboardQuickActions />
-                        </div>
-                    </div>
+{/* Recent Activity and Quick Actions */}
+<div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
+    <DashboardRecentActivity dashboardData={dashboardData} />
+    <DashboardQuickActions />
+</div>
                 </div>
             </main>
         </div>

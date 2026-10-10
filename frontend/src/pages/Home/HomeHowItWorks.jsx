@@ -34,8 +34,8 @@ function HomeHowItWorks(){
                         />
                     </div>
                     <div className="text-center">
-                        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-green-100 dark:bg-green-950">
-                            <GraduationCap className="h-9 w-9 text-green-600 dark:text-green-400" />
+                        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-950">
+                            <GraduationCap className="h-9 w-9 text-emerald-600 dark:text-emerald-400" />
                         </div>
                         <h3 className="mt-5 text-xl font-bold text-gray-900 dark:text-white">
                             Add Your Study Information

@@ -23,7 +23,7 @@ function DashboardHeader({ setIsSidebarOpen }) {
             "
         >
             {/* Left Section */}
-            <div className="flex items-center gap-3">
+            <div className="flex min-w-0 flex-1 items-center gap-2 pr-2 sm:gap-3 sm:pr-4">
 
                 {/* Mobile Menu */}
                 <button
@@ -47,7 +47,7 @@ function DashboardHeader({ setIsSidebarOpen }) {
             </div>
 
             {/* Right Section */}
-            <div className="flex items-center gap-3">
+            <div className="flex shrink-0 items-center gap-2 sm:gap-3">
 
                 {/* Dark Mode */}
                 <button
@@ -86,8 +86,8 @@ function DashboardHeader({ setIsSidebarOpen }) {
                 </div>
 
                 {/* User Info */}
-                <div className="hidden sm:block">
-                    <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                <div className="hidden min-w-0 max-w-40 sm:block">
+                    <h3 className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">
                         {user?.first_name} {user?.last_name}
                     </h3>
 

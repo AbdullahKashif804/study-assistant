@@ -1,7 +1,10 @@
-import { X, Plus, Edit3, LoaderCircle } from "lucide-react";
+import ModuleForm from "../ui/ModuleForm";
+import { Plus, Edit3, LoaderCircle } from "lucide-react";
 
 function AssignmentForm({
   form,
+  error,
+  confirmDiscard,
   handleChange,
   handleSubmit,
   handleAttachmentChange,
@@ -16,33 +19,19 @@ function AssignmentForm({
   courses = [],
 }) {
   return (
-    <section
-      ref={formSectionRef}
-      className={`fixed inset-y-0 right-0 z-50 w-full max-w-md transform overflow-y-auto overscroll-contain bg-white p-6 shadow-2xl transition-transform duration-300 ease-in-out dark:bg-slate-900 xl:static xl:z-0 xl:w-auto xl:max-w-none xl:transform-none xl:overflow-visible xl:overscroll-auto xl:rounded-2xl xl:border xl:border-slate-200 xl:shadow-sm dark:xl:border-slate-800 ${
-        isFormOpen ? "translate-x-0" : "translate-x-full xl:translate-x-0"
-      }`}
-    >
-      <div className="flex items-center justify-between border-b border-slate-200 pb-4 dark:border-slate-800">
-        <div>
-          <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">
-            {editId ? "Edit Assignment" : "Create Assignment"}
-          </h3>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-            {editId
-              ? "Update assignment details and marks."
-              : "Add a new assignment to track your progress."}
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={() => setIsFormOpen(false)}
-          className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 xl:hidden dark:hover:bg-slate-800 dark:hover:text-slate-300"
-        >
-          <X size={20} />
-        </button>
-      </div>
-
-      <form onSubmit={handleSubmit} className="mt-5 space-y-4">
+    <ModuleForm
+        title={editId ? "Edit Assignment" : "Create Assignment"}
+        description={editId ? "Update your assignment details." : "Add a assignment to your study plan."}
+        isFormOpen={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
+        formSectionRef={formSectionRef}
+        titleInputRef={titleInputRef}
+        submitting={submitting}
+        error={error}
+        confirmDiscard={confirmDiscard}
+        attachment={attachment}
+      >
+      <form onSubmit={handleSubmit} className="module-fields space-y-4 p-5">
         {/* Title */}
         <div>
           <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
@@ -55,7 +44,7 @@ function AssignmentForm({
             value={form.title}
             onChange={handleChange}
             placeholder="e.g. Calculus Midterm Prep"
-            className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-100 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:bg-slate-950 dark:focus:ring-indigo-950/50"
+            className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:bg-slate-950 dark:focus:ring-indigo-500"
           />
         </div>
 
@@ -68,7 +57,7 @@ function AssignmentForm({
             name="course"
             value={form.course}
             onChange={handleChange}
-            className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-100 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:focus:border-indigo-500 dark:focus:bg-slate-950 dark:focus:ring-indigo-950/50"
+            className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:focus:border-indigo-500 dark:focus:bg-slate-950 dark:focus:ring-indigo-500"
           >
             <option value="" className="dark:bg-slate-900">
               Select a Course
@@ -96,7 +85,7 @@ function AssignmentForm({
               name="dueDate"
               value={form.dueDate}
               onChange={handleChange}
-              className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-100 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:focus:border-indigo-500 dark:focus:bg-slate-950 dark:focus:ring-indigo-950/50"
+              className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:focus:border-indigo-500 dark:focus:bg-slate-950 dark:focus:ring-indigo-500"
             />
           </div>
 
@@ -109,7 +98,7 @@ function AssignmentForm({
               value={form.status}
               onChange={handleChange}
               disabled={!editId}
-              className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 outline-none transition disabled:opacity-60 focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-100 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:focus:border-indigo-500 dark:focus:bg-slate-950 dark:focus:ring-indigo-950/50"
+              className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 outline-none transition disabled:opacity-60 focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:focus:border-indigo-500 dark:focus:bg-slate-950 dark:focus:ring-indigo-500"
             >
               <option value="Pending" className="dark:bg-slate-900">
                 Pending
@@ -139,7 +128,7 @@ function AssignmentForm({
               value={form.totalMark}
               onChange={handleChange}
               placeholder="100"
-              className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-100 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:bg-slate-950 dark:focus:ring-indigo-950/50"
+              className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:bg-slate-950 dark:focus:ring-indigo-500"
             />
           </div>
 
@@ -153,7 +142,7 @@ function AssignmentForm({
               value={form.obtainedMark}
               onChange={handleChange}
               placeholder="Optional"
-              className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-100 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:bg-slate-950 dark:focus:ring-indigo-950/50"
+              className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:bg-slate-950 dark:focus:ring-indigo-500"
             />
           </div>
         </div>
@@ -169,7 +158,7 @@ function AssignmentForm({
             value={form.description}
             onChange={handleChange}
             placeholder="Add task specifications or submission notes..."
-            className="mt-1.5 w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-100 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:bg-slate-950 dark:focus:ring-indigo-950/50"
+            className="mt-1.5 w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:bg-slate-950 dark:focus:ring-indigo-500"
           />
         </div>
 
@@ -200,7 +189,7 @@ function AssignmentForm({
           <button
             type="submit"
             disabled={submitting}
-            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-100 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-indigo-600 dark:hover:bg-indigo-500 dark:focus:ring-indigo-950/50"
+            className="btn-primary flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold shadow-sm transition focus:outline-none focus:ring-4 disabled:cursor-not-allowed"
           >
             {submitting ? (
               <>
@@ -220,18 +209,16 @@ function AssignmentForm({
             )}
           </button>
 
-          {isFormOpen && (
             <button
               type="button"
-              onClick={handleCancel}
+              data-reset-form disabled={submitting} onClick={handleCancel}
               className="rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800"
             >
-              Cancel
+              {editId || isFormOpen ? "Cancel" : "Clear Form"}
             </button>
-          )}
         </div>
       </form>
-    </section>
+    </ModuleForm>
   );
 }
 

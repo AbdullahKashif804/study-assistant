@@ -179,7 +179,7 @@ if (!formElement.checkValidity()) {
                       }
                       placeholder="First Name"
                       required
-                      className="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-4 text-gray-900 outline-none transition placeholder:text-gray-400 focus:ring-2 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-blue-900"
+                      className="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-4 text-gray-900 outline-none transition placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-indigo-500"
                     />
                   </div>
                 </div>
@@ -206,7 +206,7 @@ if (!formElement.checkValidity()) {
                       }
                       placeholder="Last Name"
                       required
-                      className="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-4 text-gray-900 outline-none transition placeholder:text-gray-400 focus:ring-2 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-blue-900"
+                      className="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-4 text-gray-900 outline-none transition placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-indigo-500"
                     />
                   </div>
                 </div>
@@ -235,7 +235,7 @@ if (!formElement.checkValidity()) {
                     placeholder="name@example.com"
                     pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
                     required
-                    className="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-4 text-gray-900 outline-none transition placeholder:text-gray-400 focus:ring-2 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-blue-900"
+                    className="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-4 text-gray-900 outline-none transition placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-indigo-500"
                   />
                 </div>
               </div>
@@ -260,7 +260,7 @@ if (!formElement.checkValidity()) {
                       handleChange
                     }
                     required
-                    className="w-full appearance-none rounded-lg border border-gray-300 bg-white py-2.5 pl-4 pr-10 text-gray-700 outline-none transition focus:ring-2 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:focus:ring-blue-900"
+                    className="w-full appearance-none rounded-lg border border-gray-300 bg-white py-2.5 pl-4 pr-10 text-gray-700 outline-none transition focus:ring-2 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:focus:ring-indigo-500"
                   >
                     <option
                       value=""
@@ -336,7 +336,7 @@ if (!formElement.checkValidity()) {
                     autoComplete="new-password"
                     placeholder="Enter password"
                     required
-                    className="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-12 text-gray-900 outline-none transition placeholder:text-gray-400 focus:ring-2 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-blue-900"
+                    className="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-12 text-gray-900 outline-none transition placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-indigo-500"
                   />
 
                   <button
@@ -371,7 +371,7 @@ if (!formElement.checkValidity()) {
                       e.target.checked
                     )
                   }
-                  className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:checked:bg-blue-600"
+                  className="mt-1 h-4 w-4 rounded border-gray-300 accent-indigo-600 text-indigo-600 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-700 dark:checked:bg-indigo-600"
                 />
 
                 <label
@@ -411,7 +411,7 @@ if (!formElement.checkValidity()) {
                   loading ||
                   !agreedToTerms
                 }
-                className="w-full rounded-lg bg-blue-600 py-3 font-semibold text-white shadow-md transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-600 dark:hover:bg-blue-500 dark:focus:ring-offset-slate-900"
+                className="btn-primary w-full rounded-lg py-3 font-semibold shadow-md transition-colors disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
               >
                 {loading
                   ? "Creating account..."
@@ -441,7 +441,7 @@ if (!formElement.checkValidity()) {
                     "Network"
                   )
                     ? "text-red-600 dark:text-red-400"
-                    : "text-green-600 dark:text-green-400"
+                    : "text-emerald-600 dark:text-emerald-400"
                 }`}
               >
                 {message}
@@ -473,7 +473,7 @@ if (!formElement.checkValidity()) {
             <div className="mt-7 space-y-4">
 
               <div className="flex items-start gap-3">
-                <CheckCircle2 className="mt-1 h-5 w-5 shrink-0 text-green-600 dark:text-green-400" />
+                <CheckCircle2 className="mt-1 h-5 w-5 shrink-0 text-emerald-600 dark:text-emerald-400" />
 
                 <p className="text-gray-700 dark:text-slate-300">
                   Manage notes,
@@ -483,7 +483,7 @@ if (!formElement.checkValidity()) {
               </div>
 
               <div className="flex items-start gap-3">
-                <CheckCircle2 className="mt-1 h-5 w-5 shrink-0 text-green-600 dark:text-green-400" />
+                <CheckCircle2 className="mt-1 h-5 w-5 shrink-0 text-emerald-600 dark:text-emerald-400" />
 
                 <p className="text-gray-700 dark:text-slate-300">
                   Track upcoming
@@ -493,7 +493,7 @@ if (!formElement.checkValidity()) {
               </div>
 
               <div className="flex items-start gap-3">
-                <CheckCircle2 className="mt-1 h-5 w-5 shrink-0 text-green-600 dark:text-green-400" />
+                <CheckCircle2 className="mt-1 h-5 w-5 shrink-0 text-emerald-600 dark:text-emerald-400" />
 
                 <p className="text-gray-700 dark:text-slate-300">
                   View your complete

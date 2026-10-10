@@ -1,3 +1,5 @@
+import Pagination from "../../components/ui/Pagination";
+import useFormDraft from "../../hooks/useFormDraft";
 import {
   BookOpen,
   CalendarDays,
@@ -63,6 +65,8 @@ function Assignments() {
 
   const formSectionRef = useRef(null);
   const titleInputRef = useRef(null);
+
+  const confirmDiscard = useFormDraft(form, attachment, emptyForm);
 
   const token = localStorage.getItem("token");
 
@@ -148,16 +152,17 @@ function Assignments() {
     setIsFormOpen(true);
 
     setTimeout(() => {
-      formSectionRef.current?.scrollIntoView({
+      if (window.matchMedia("(min-width: 1024px)").matches) { formSectionRef.current?.scrollIntoView({
         behavior: "smooth",
         block: "center",
-      });
+      }); }
 
       titleInputRef.current?.focus();
     }, 100);
   }
 
   function handleNewAssignment() {
+    if (submitting || !confirmDiscard()) return;
     setForm(emptyForm);
     setAttachment(null);
     setEditId(null);
@@ -168,6 +173,7 @@ function Assignments() {
   }
 
   function handleEdit(assignment) {
+    if (submitting || !confirmDiscard()) return;
     setEditId(assignment._id);
 
     setForm({
@@ -387,8 +393,10 @@ function Assignments() {
       />
       <div className="min-w-0 flex-1">
         <DashboardHeader setIsSidebarOpen={setIsSidebarOpen} />
-        <main className="mx-auto mt-20 max-w-7xl px-4 py-6 sm:px-6 lg:pl-68">
+        <main className="workspace-content ">
           <AssignmentToolbar
+
+            busy={submitting}
             search={search}
             setSearch={setSearch}
             statusFilter={statusFilter}
@@ -415,7 +423,7 @@ function Assignments() {
           )}
 
           <div className="mt-6">
-            <section className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <section className="mb-6 grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
               <StatCard
                 title="Total Assignments"
                 value={assignmentStats.total}
@@ -443,8 +451,9 @@ function Assignments() {
             </section>
           </div>
 
-          <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_400px]">
-            <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.85fr)] xl:grid-cols-[minmax(0,1fr)_400px]">
+            <section aria-label="Assignments" className="module-records overflow-visible rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+              <h2 className="border-b border-slate-200 px-5 py-4 text-lg font-bold text-slate-900 dark:border-slate-800 dark:text-slate-100">All Assignments</h2>
               <div className="p-4 sm:p-5">
                 <AssignmentList
                   assignments={assignments}
@@ -459,17 +468,13 @@ function Assignments() {
                   formatDate={formatDate}
                 />
               </div>
-              {!fetching && (
-                <div className="mt-6 flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-900 sm:flex-row sm:items-center sm:justify-between">
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
-                    Showing page 1 of 1 • {assignments.length} total {assignments.length === 1 ? "assignment" : "assignments"}
-                  </p>
-                </div>
-              )}
+              {!fetching && <Pagination totalItems={assignments.length} itemLabel="assignment" />}
             </section>
 
-            <div className="xl:sticky xl:top-6 xl:max-h-[calc(100vh-3rem)] xl:self-start xl:overflow-y-auto xl:overscroll-contain">
+            <div className="contents">
               <AssignmentForm
+              error={error}
+              confirmDiscard={confirmDiscard}
                 form={form}
                 handleChange={handleChange}
                 handleSubmit={handleSubmit}
@@ -486,14 +491,7 @@ function Assignments() {
               />
             </div>
 
-            {isFormOpen && (
-              <button
-                type="button"
-                aria-label="Close assignment form"
-                onClick={() => setIsFormOpen(false)}
-                className="fixed inset-0 z-40 bg-slate-950/40 backdrop-blur-xs xl:hidden dark:bg-slate-950/70"
-              />
-            )}
+
           </div>
         </main>
       </div>

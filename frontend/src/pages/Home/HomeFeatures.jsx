@@ -36,8 +36,8 @@ function HomeFeatures(){
                         </p>
                     </div>
                     <div className="h-full rounded-2xl border border-blue-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-950">
-                            <ClipboardList className='h-6 w-6 text-green-600 dark:text-green-400'/>
+                        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-950">
+                            <ClipboardList className='h-6 w-6 text-emerald-600 dark:text-emerald-400'/>
                         </div>
                         <h3 className='text-xl font-bold text-gray-900 dark:text-white'>Assignment Tracking</h3>
                         <p className='mt-3 leading-7 text-gray-600 dark:text-gray-400'>

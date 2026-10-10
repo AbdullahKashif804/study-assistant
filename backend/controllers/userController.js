@@ -1,13 +1,7 @@
 const bcrypt = require("bcrypt");
 const userModel = require("../models/Users.js");
 
-const noteModel = require("../models/Notes");
-const assignmentModel = require("../models/Assignments");
-const projectModel = require("../models/Projects");
-const quizModel = require("../models/Quizzes");
-const courseModel = require("../models/Courses");
-const dailyTaskModel = require("../models/DailyTasks");
-const todoTaskModel = require("../models/todoTask");
+const { deleteAccount } = require("../services/accountDeletionService");
 
 const jwt = require("jsonwebtoken");
 const path = require("path");
@@ -550,112 +544,15 @@ const changePassword = async (req, res) => {
 };
 
 const DeleteAccount = async (req, res) => {
+  if (req.body?.confirmation !== "DELETE") {
+    return res.status(400).json({
+      success: false,
+      message: "Please type DELETE to confirm account deletion",
+    });
+  }
+
   try {
-    const userId = req.user._id;
-
-    const notes = await noteModel.find({
-      user: userId,
-    });
-
-    for (const note of notes) {
-      if (note.attachment?.publicId) {
-        await deleteFromCloudinary(
-          note.attachment.publicId,
-          note.attachment.resourceType || "raw"
-        );
-      }
-    }
-
-    await noteModel.deleteMany({
-      user: userId,
-    });
-
-    const assignments = await assignmentModel.find({
-      user: userId,
-    });
-
-    for (const assignment of assignments) {
-      if (assignment.attachment?.publicId) {
-        await deleteFromCloudinary(
-          assignment.attachment.publicId,
-          assignment.attachment.resourceType || "raw"
-        );
-      }
-    }
-
-    await assignmentModel.deleteMany({
-      user: userId,
-    });
-
-    const projects = await projectModel.find({
-      user: userId,
-    });
-
-    for (const project of projects) {
-      if (project.attachment?.publicId) {
-        await deleteFromCloudinary(
-          project.attachment.publicId,
-          project.attachment.resourceType || "raw"
-        );
-      }
-    }
-
-    await projectModel.deleteMany({
-      user: userId,
-    });
-
-    const courses = await courseModel.find({
-      user: userId,
-    });
-
-    for (const course of courses) {
-      if (course.attachment?.publicId) {
-        await deleteFromCloudinary(
-          course.attachment.publicId,
-          course.attachment.resourceType || "raw"
-        );
-      }
-    }
-
-    await courseModel.deleteMany({
-      user: userId,
-    });
-
-    const quizzes = await quizModel.find({
-      user: userId,
-    });
-
-    for (const quiz of quizzes) {
-      if (quiz.attachment?.publicId) {
-        await deleteFromCloudinary(
-          quiz.attachment.publicId,
-          quiz.attachment.resourceType || "raw"
-        );
-      }
-    }
-
-    await quizModel.deleteMany({
-      user: userId,
-    });
-
-    await dailyTaskModel.deleteMany({
-      user: userId,
-    });
-
-    await todoTaskModel.deleteMany({
-      user: userId,
-    });
-
-    const user = await userModel.findById(userId);
-
-    if (user?.profileImage?.publicId) {
-      await deleteFromCloudinary(
-        user.profileImage.publicId,
-        user.profileImage.resourceType || "image"
-      );
-    }
-
-    await userModel.findByIdAndDelete(userId);
+    await deleteAccount(req.user._id);
 
     return res.status(200).json({
       success: true,
@@ -666,7 +563,7 @@ const DeleteAccount = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: "Account deletion could not be completed. Cleanup may be partially finished. Retry permanent deletion in Settings; contact support if it keeps failing.",
     });
   }
 };

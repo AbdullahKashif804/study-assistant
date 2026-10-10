@@ -38,7 +38,7 @@ function HomeHero() {
               <>
                 <Link
                   to="/dashboard"
-                  className="rounded-lg bg-blue-600 px-6 py-3 font-medium text-white shadow-sm transition-colors hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500"
+                  className="btn-primary rounded-lg px-6 py-3 font-medium shadow-sm transition-colors"
                 >
                   Dashboard
                 </Link>
@@ -55,14 +55,14 @@ function HomeHero() {
               <>
                 <Link
                   to="/signup"
-                  className="rounded-lg bg-blue-600 px-6 py-3 font-medium text-white shadow-sm transition-colors hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500"
+                  className="btn-primary rounded-lg px-6 py-3 font-medium shadow-sm transition-colors"
                 >
                   Get Started
                 </Link>
 
                 <Link
                   to="/login"
-                  className="rounded-lg border border-blue-600 px-6 py-3 font-medium text-blue-600 transition-colors hover:bg-blue-600 hover:text-white dark:border-blue-500 dark:text-blue-400 dark:hover:bg-blue-600 dark:hover:text-white"
+                  className="rounded-lg border border-indigo-600 px-6 py-3 font-medium text-indigo-600 transition-colors hover:bg-indigo-600 hover:text-white dark:border-indigo-500 dark:text-indigo-400 dark:hover:bg-indigo-600 dark:hover:text-white"
                 >
                   Login
                 </Link>

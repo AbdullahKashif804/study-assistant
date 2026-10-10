@@ -62,7 +62,7 @@ function QuizList({
   }
 
   return (
-    <div className="divide-y divide-slate-100 dark:divide-slate-800">
+    <div className="space-y-4">
       {quizzes.map((quiz) => {
         const status = getQuizStatus ? getQuizStatus(quiz) : quiz.status;
         const isMenuOpen = openMenuId === quiz._id;
@@ -71,48 +71,32 @@ function QuizList({
         return (
           <article
             key={quiz._id}
-            className="relative p-4 transition-colors hover:bg-slate-50/80 sm:p-5 dark:hover:bg-slate-800/40"
+            className="module-card"
           >
             <div className="flex items-start gap-4">
-              <div className="hidden rounded-full bg-violet-50 p-3 text-violet-600 sm:block dark:bg-violet-950/50 dark:text-violet-400">
-                <ClipboardCheck size={22} />
+              <div className="hidden rounded-xl bg-violet-50 p-3 text-violet-600 sm:block dark:bg-violet-950/50 dark:text-violet-400">
+                <ClipboardCheck size={20} />
               </div>
 
               <div className="min-w-0 flex-1">
-                <div className="flex items-start justify-between gap-4">
+                <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <h2 className="truncate text-base font-semibold text-slate-900 dark:text-slate-100">
                       {quiz.title}
                     </h2>
 
                     {quiz.course && (
-                      <p className="mt-1 truncate text-xs font-medium text-indigo-600 dark:text-indigo-400">
+                      <p className="mt-1 text-sm font-medium text-indigo-600 dark:text-indigo-400">
                         {quiz.course.title}
                         {quiz.course.courseCode && ` (${quiz.course.courseCode})`}
                       </p>
                     )}
 
-                    <div className="mt-2 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                      <CalendarDays size={15} />
-                      <span>
-                        Due {formatDate ? formatDate(quiz.dueDate) : quiz.dueDate}
-                      </span>
-                    </div>
+
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <div className="text-right">
-                      <span
-                          className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ring-1 ring-inset ${
-                            statusStyles[status] || "bg-slate-100 text-slate-700 ring-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700"
-                        }`}
-                      >
-                        {status}
-                      </span>
-                      <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-                        Score: {quiz.obtainedMark ?? "—"}/{quiz.totalMark}
-                      </p>
-                    </div>
+
 
                     <div className="relative" ref={isMenuOpen ? menuRef : null}>
                       <button
@@ -125,8 +109,9 @@ function QuizList({
                             currentId === quiz._id ? null : quiz._id
                           )
                         }
-                        className="rounded-lg p-2 text-slate-400 hover:bg-slate-200 hover:text-slate-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 dark:hover:bg-slate-800 dark:hover:text-slate-200 dark:focus:ring-offset-slate-900"
-                      >
+                        className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:hover:bg-slate-800 dark:hover:text-slate-200 dark:focus:ring-offset-slate-900"
+
+                        >
                         <MoreVertical size={19} />
                       </button>
 
@@ -160,6 +145,24 @@ function QuizList({
                     </div>
                   </div>
                 </div>
+                    <div className="mt-4 flex flex-wrap items-center gap-3">
+                      <span
+                          className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset ${
+                            statusStyles[status] || "bg-slate-100 text-slate-700 ring-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700"
+                        }`}
+                      >
+                        {status}
+                      </span>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        Score: {quiz.obtainedMark ?? "—"}/{quiz.totalMark}
+                      </p>
+                    <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                      <CalendarDays size={15} />
+                      <span>
+                        Due {formatDate ? formatDate(quiz.dueDate) : quiz.dueDate}
+                      </span>
+                    </div>
+                    </div>
               </div>
             </div>
           </article>

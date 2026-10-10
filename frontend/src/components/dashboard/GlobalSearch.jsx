@@ -84,7 +84,7 @@ function GlobalSearch() {
     return (
         <div
             ref={searchRef}
-            className="relative w-40 min-w-0 sm:w-64 md:w-80"
+            className="relative w-full min-w-0 max-w-80"
         >
             <Search
                 className="
@@ -105,6 +105,7 @@ function GlobalSearch() {
                     }
                 }}
                 placeholder="Search..."
+                aria-label="Search all study records"
                 className="
                     w-full rounded-xl
                     border border-slate-200
@@ -115,17 +116,17 @@ function GlobalSearch() {
 
                     placeholder:text-slate-400
 
-                    focus:border-blue-500
+                    focus:border-indigo-500
                     focus:bg-white
-                    focus:ring-4 focus:ring-blue-100
+                    focus:ring-4 focus:ring-indigo-500
 
                     dark:border-slate-800
                     dark:bg-slate-900
                     dark:text-slate-200
                     dark:placeholder:text-slate-500
-                    dark:focus:border-blue-600
+                    dark:focus:border-indigo-600
                     dark:focus:bg-slate-900
-                    dark:focus:ring-blue-950/50
+                    dark:focus:ring-indigo-500
                 "
             />
 

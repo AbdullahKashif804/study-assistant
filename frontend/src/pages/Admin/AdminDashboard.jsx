@@ -71,7 +71,7 @@ function AdminDashboard() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-950">
         <div className="text-center">
-          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-blue-100 border-t-blue-600 dark:border-slate-800 dark:border-t-blue-500"></div>
+          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-indigo-100 border-t-indigo-600 dark:border-slate-800 dark:border-t-indigo-500"></div>
           <p className="mt-4 text-sm font-medium text-gray-600 dark:text-slate-400">
             Loading admin dashboard...
           </p>
@@ -160,7 +160,7 @@ function AdminDashboard() {
       <DashboardHeader setIsSidebarOpen={setIsSidebarOpen} />
 
       {accessDenied ? (
-        <div className="mx-auto mt-20 min-h-screen max-w-7xl bg-slate-50 px-4 py-6 transition-colors dark:bg-slate-950 sm:px-6 lg:pl-68">
+        <div className="workspace-content min-h-screen bg-slate-50 transition-colors dark:bg-slate-950">
           <div className="flex min-h-[80vh] items-center justify-center">
             <div className="text-center">
               <h1 className="text-3xl font-bold text-red-600 dark:text-red-400">
@@ -173,7 +173,7 @@ function AdminDashboard() {
           </div>
         </div>
       ) : (
-        <div className="mx-auto mt-20 min-h-screen max-w-7xl bg-slate-50 px-4 py-6 transition-colors dark:bg-slate-950 sm:px-6 lg:pl-68">
+        <div className="workspace-content min-h-screen bg-slate-50 transition-colors dark:bg-slate-950">
           <div className="mx-auto max-w-7xl">
             <div className="mb-8">
               <div className="flex items-center gap-3">

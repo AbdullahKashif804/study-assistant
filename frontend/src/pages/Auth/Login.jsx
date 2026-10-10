@@ -75,7 +75,7 @@ navigate('/Dashboard');
                                         onChange={(e) => setEmail(e.target.value)}
                                         placeholder="name@example.com"
                                         autoComplete="new-password"
-                                        className="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-4 outline-none transition placeholder:text-gray-400 focus:ring-2 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder:text-gray-500 dark:focus:ring-blue-950"
+                                        className="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-4 outline-none transition placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder:text-gray-500 dark:focus:ring-indigo-500"
                                         required
                                     />
                                 </div>
@@ -95,7 +95,7 @@ navigate('/Dashboard');
                                         onChange={(e) => setPassword(e.target.value)}
                                         placeholder="Enter Password"
                                         autoComplete="new-password"
-                                        className="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-4 outline-none transition placeholder:text-gray-400 focus:ring-2 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder:text-gray-500 dark:focus:ring-blue-950"
+                                        className="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-4 outline-none transition placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder:text-gray-500 dark:focus:ring-indigo-500"
                                         required
                                     />
                                     <button
@@ -110,7 +110,7 @@ navigate('/Dashboard');
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full rounded-lg bg-blue-600 py-3 font-semibold text-white shadow-md transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-600 dark:hover:bg-blue-500">
+                                className="btn-primary w-full rounded-lg py-3 font-semibold shadow-md transition-colors disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2">
                                 {loading ? "Signing in ...." : "Sign In"}
                             </button>
                         </form>

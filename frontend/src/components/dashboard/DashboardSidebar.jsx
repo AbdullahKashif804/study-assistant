@@ -16,6 +16,7 @@ import {
 
 import { NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useLayoutEffect, useRef } from "react";
+import useResponsiveDialog from "../../hooks/useResponsiveDialog";
 
 const dashboard_items = [
     {
@@ -97,6 +98,8 @@ function DashboardSidebar({
     const navigate = useNavigate();
     const location = useLocation();
     const navigationRef = useRef(null);
+    const drawerRef = useRef(null);
+    const compact = useResponsiveDialog(drawerRef, isSidebarOpen);
 
     useLayoutEffect(() => {
         const navigation = navigationRef.current;
@@ -125,10 +128,21 @@ function DashboardSidebar({
 
     return (
         <>
-            <aside
+            <dialog
+                ref={drawerRef}
+                role={compact ? "dialog" : "complementary"}
+                aria-label="Main navigation"
+                aria-modal={compact && isSidebarOpen ? true : undefined}
+                onCancel={(event) => { event.preventDefault(); setIsSidebarOpen(false); }}
+                onClick={(event) => {
+                    if (compact && event.target === event.currentTarget &&
+                        event.clientX > event.currentTarget.getBoundingClientRect().right) {
+                        setIsSidebarOpen(false);
+                    }
+                }}
                 className={`
-                    fixed left-0 top-0 z-50
-                    flex h-screen w-64 shrink-0 flex-col
+                    navigation-drawer fixed left-0 top-0 z-50 m-0 max-h-none max-w-none
+                    h-dvh w-64 shrink-0 flex-col
                     border-r border-slate-200
                     bg-white
                     px-4 py-6
@@ -187,7 +201,7 @@ function DashboardSidebar({
                                 className={({ isActive }) =>
                                     `flex w-full items-center gap-3.5 rounded-xl px-4 py-3 text-sm font-medium transition-all ${
                                         isActive
-                                            ? "bg-blue-50 text-blue-600 shadow-sm shadow-blue-50/50 dark:bg-blue-950/50 dark:text-blue-400 dark:shadow-none"
+                                            ? "bg-indigo-50 text-indigo-600 shadow-sm shadow-indigo-50/50 dark:bg-indigo-950/50 dark:text-indigo-400 dark:shadow-none"
                                             : "text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
                                     }`
                                 }
@@ -197,7 +211,7 @@ function DashboardSidebar({
                                         <Icon
                                             className={`h-5 w-5 ${
                                                 isActive
-                                                    ? "text-blue-600 dark:text-blue-400"
+                                                    ? "text-indigo-600 dark:text-indigo-400"
                                                     : "text-slate-400 dark:text-slate-500"
                                             }`}
                                         />
@@ -217,7 +231,7 @@ function DashboardSidebar({
                             className={({ isActive }) =>
                                 `flex w-full items-center gap-3.5 rounded-xl px-4 py-3 text-sm font-medium transition-all ${
                                     isActive
-                                        ? "bg-blue-50 text-blue-600 shadow-sm shadow-blue-50/50 dark:bg-blue-950/50 dark:text-blue-400 dark:shadow-none"
+                                        ? "bg-indigo-50 text-indigo-600 shadow-sm shadow-indigo-50/50 dark:bg-indigo-950/50 dark:text-indigo-400 dark:shadow-none"
                                         : "text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
                                 }`
                             }
@@ -227,7 +241,7 @@ function DashboardSidebar({
                                     <ShieldCheck
                                         className={`h-5 w-5 ${
                                             isActive
-                                                ? "text-blue-600 dark:text-blue-400"
+                                                ? "text-indigo-600 dark:text-indigo-400"
                                                 : "text-slate-400 dark:text-slate-500"
                                         }`}
                                     />
@@ -248,10 +262,10 @@ function DashboardSidebar({
                                 flex h-10 w-10
                                 items-center justify-center
                                 rounded-full
-                                bg-blue-50
-                                font-semibold text-blue-600
-                                dark:bg-blue-900/30
-                                dark:text-blue-400
+                                bg-indigo-50
+                                font-semibold text-indigo-600
+                                dark:bg-indigo-900/30
+                                dark:text-indigo-400
                             "
                         >
                             {initials}
@@ -285,7 +299,7 @@ function DashboardSidebar({
                         Logout
                     </button>
                 </div>
-            </aside>
+            </dialog>
         </>
     );
 }

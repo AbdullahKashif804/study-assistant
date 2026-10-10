@@ -146,7 +146,7 @@ const handleResend = async () => {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="name@example.com"
                     required
-                    className="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-4 text-gray-900 outline-none transition placeholder:text-gray-400 focus:ring-2 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-blue-900"
+                    className="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-4 text-gray-900 outline-none transition placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-indigo-500"
                   />
                 </div>
               </div>
@@ -170,7 +170,7 @@ const handleResend = async () => {
                   placeholder="Enter 6-digit code"
                   maxLength="6"
                   required
-                  className="mt-1.5 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-center text-lg font-semibold tracking-[0.3em] text-gray-900 outline-none transition placeholder:text-sm placeholder:font-normal placeholder:tracking-normal placeholder:text-gray-400 focus:ring-2 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-blue-900"
+                  className="mt-1.5 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-center text-lg font-semibold tracking-[0.3em] text-gray-900 outline-none transition placeholder:text-sm placeholder:font-normal placeholder:tracking-normal placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-indigo-500"
                 />
               </div>
 
@@ -188,7 +188,7 @@ const handleResend = async () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full rounded-lg bg-blue-600 py-3 font-semibold text-white shadow-md transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-600 dark:hover:bg-blue-500 dark:focus:ring-offset-slate-900"
+                className="btn-primary w-full rounded-lg py-3 font-semibold shadow-md transition-colors disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
               >
                 {loading ? "Verifying..." : "Verify Email"}
               </button>
@@ -198,7 +198,7 @@ const handleResend = async () => {
   type="button"
   onClick={handleResend}
   disabled={resending || loading}
-  className="w-full rounded-lg border border-blue-600 py-3 font-semibold text-blue-600 transition-colors hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-blue-500 dark:text-blue-400 dark:hover:bg-blue-900/20"
+  className="w-full rounded-lg border border-indigo-600 py-3 font-semibold text-indigo-600 transition-colors hover:bg-indigo-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-indigo-500 dark:text-indigo-400 dark:hover:bg-indigo-900/20"
 >
   {resending ? "Sending..." : "Resend Verification Code"}
 </button>
@@ -211,7 +211,7 @@ const handleResend = async () => {
   className={`mt-4 text-center text-sm ${
     messageType === "error"
       ? "text-red-600 dark:text-red-400"
-      : "text-green-600 dark:text-green-400"
+      : "text-emerald-600 dark:text-emerald-400"
   }`}
 >
   {message}

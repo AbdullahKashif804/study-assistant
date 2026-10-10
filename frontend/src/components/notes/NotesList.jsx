@@ -16,7 +16,7 @@ function NotesList({
 }) {
   if (loading) {
     return (
-      <div className="flex min-h-72 items-center justify-center rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+      <div className="flex min-h-72 items-center justify-center">
         <div className="text-center">
           <LoaderCircle className="mx-auto h-7 w-7 animate-spin text-indigo-600 dark:text-indigo-400" />
           <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">Loading notes...</p>
@@ -27,7 +27,7 @@ function NotesList({
 
   if (notes.length === 0) {
     return (
-      <div className="flex min-h-72 flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white px-6 text-center dark:border-slate-700 dark:bg-slate-900">
+      <div className="flex min-h-72 flex-col items-center justify-center px-5 text-center">
         <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-50 dark:bg-slate-800">
   <FileText className="h-7 w-7 text-blue-600" />
 </div>
@@ -41,12 +41,9 @@ function NotesList({
         </p>
 
         {!search && (
-          <button
-            type="button"
-            onClick={openCreateForm}
-            className="mt-5 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:ring-offset-2 dark:bg-indigo-600 dark:hover:bg-indigo-500 dark:focus:ring-indigo-950/50 dark:focus:ring-offset-slate-900"
-          >
-            Create First Note
+          <button type="button" onClick={openCreateForm}
+            className="btn-primary mt-4 rounded-xl px-4 py-2.5 text-sm font-semibold">
+            Create Note
           </button>
         )}
       </div>
@@ -54,7 +51,7 @@ function NotesList({
   }
 
   return (
-    <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+    <div className="space-y-4">
       {notes.map((note, index) => (
         <NoteCard
           key={note._id || index}

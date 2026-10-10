@@ -37,7 +37,7 @@ function Header({ variant = "home" }) {
 
   <Link 
     to='/'
-    className='transition-colors hover:text-blue-600 dark:hover:text-blue-400'
+    className='transition-colors hover:text-indigo-600 dark:hover:text-indigo-400'
   >
     Home
   </Link>
@@ -46,14 +46,14 @@ function Header({ variant = "home" }) {
     <>
       <a 
         href='#features'
-        className='transition-colors hover:text-blue-600 dark:hover:text-blue-400'
+        className='transition-colors hover:text-indigo-600 dark:hover:text-indigo-400'
       >
         Features
       </a>
 
       <a 
         href='#how-it-works'
-        className='transition-colors hover:text-blue-600 dark:hover:text-blue-400'
+        className='transition-colors hover:text-indigo-600 dark:hover:text-indigo-400'
       >
         How it works
       </a>
@@ -92,7 +92,7 @@ function Header({ variant = "home" }) {
 
               <Link
                 to='/signup'
-                className='rounded-lg border border-transparent bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500'
+                className='btn-primary rounded-lg border border-transparent px-4 py-2 text-sm font-semibold transition-colors'
               >
                 Get Started
               </Link>
@@ -124,7 +124,7 @@ function Header({ variant = "home" }) {
       <Link
         to='/'
         onClick={() => setIsOpen(false)}
-        className='rounded-md px-3 py-2 transition-colors hover:bg-slate-200/50 hover:text-blue-600 dark:hover:bg-slate-800 dark:hover:text-blue-400'
+        className='rounded-md px-3 py-2 transition-colors hover:bg-slate-200/50 hover:text-indigo-600 dark:hover:bg-slate-800 dark:hover:text-indigo-400'
       >
         Home
       </Link>
@@ -135,7 +135,7 @@ function Header({ variant = "home" }) {
           <a
             href='#features'
             onClick={() => setIsOpen(false)}
-            className='rounded-md px-3 py-2 transition-colors hover:bg-slate-200/50 hover:text-blue-600 dark:hover:bg-slate-800 dark:hover:text-blue-400'
+            className='rounded-md px-3 py-2 transition-colors hover:bg-slate-200/50 hover:text-indigo-600 dark:hover:bg-slate-800 dark:hover:text-indigo-400'
           >
             Features
           </a>
@@ -143,7 +143,7 @@ function Header({ variant = "home" }) {
           <a
             href='#how-it-works'
             onClick={() => setIsOpen(false)}
-            className='rounded-md px-3 py-2 transition-colors hover:bg-slate-200/50 hover:text-blue-600 dark:hover:bg-slate-800 dark:hover:text-blue-400'
+            className='rounded-md px-3 py-2 transition-colors hover:bg-slate-200/50 hover:text-indigo-600 dark:hover:bg-slate-800 dark:hover:text-indigo-400'
           >
             How it works
           </a>
@@ -186,7 +186,7 @@ function Header({ variant = "home" }) {
             <Link
               to='/signup'
               onClick={() => setIsOpen(false)}
-              className='w-full rounded-lg bg-blue-600 py-2 text-center text-sm font-bold text-white transition-colors hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500'
+              className='btn-primary w-full rounded-lg py-2 text-center text-sm font-bold transition-colors'
             >
               Sign up
             </Link>

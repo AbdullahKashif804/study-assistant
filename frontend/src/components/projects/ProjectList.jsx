@@ -1,6 +1,4 @@
 import {
-  ClipboardList,
-  BookOpen,
   MoreVertical,
   Pencil,
   Trash2,
@@ -45,37 +43,27 @@ function ProjectList({
           </p>
         </div>
       ) : (
-        <div>
+        <div className="space-y-4">
           {projects.map((project) => (
             <article
               key={project._id}
-              className="relative border-b border-slate-100 p-5 transition-colors hover:bg-slate-50 sm:p-6 dark:border-slate-800 dark:hover:bg-slate-800/40"
+              className="module-card"
             >
               <div className="flex items-start gap-4">
-                <div className="hidden rounded-full bg-blue-50 p-3 text-blue-600 sm:block dark:bg-blue-950/60 dark:text-blue-400">
-                  <Code2 size={22} />
+                <div className="hidden rounded-xl bg-violet-50 p-3 text-violet-600 sm:block dark:bg-violet-950/60 dark:text-violet-400">
+                  <Code2 size={20} />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">
                         {project.title}
                       </h2>
-                      <p className="mt-1 text-xs font-medium text-indigo-600 dark:text-indigo-400">
+                      <p className="mt-1 text-sm font-medium text-indigo-600 dark:text-indigo-400">
                         {project.course?.title} ({project.course?.courseCode})
                       </p>
                     </div>
                     <div className="flex items-start gap-3">
-                      <div className="text-right">
-                        <span
-                          className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ring-1 ring-inset ${
-                            statusStyles[project.status] ||
-                            statusStyles["In Progress"]
-                          }`}
-                        >
-                          {project.status || "In Progress"}
-                        </span>
-                      </div>
                       <div className="relative">
                         <button
                           type="button"
@@ -84,7 +72,10 @@ function ProjectList({
                               currentId === project._id ? null : project._id
                             )
                           }
-                          className="rounded-lg p-2 text-slate-400 hover:bg-slate-200 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+                          className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+
+                          aria-label="project options"
+                          aria-expanded={openMenuId === project._id}
                         >
                           <MoreVertical size={19} />
                         </button>
@@ -134,7 +125,16 @@ function ProjectList({
                     </div>
                   )}
 
-                  <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-slate-500 dark:text-slate-400">
+                  <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+
+                        <span
+                          className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset ${
+                            statusStyles[project.status] ||
+                            statusStyles["In Progress"]
+                          }`}
+                        >
+                          {project.status || "In Progress"}
+                        </span>
                     <div className="flex items-center gap-2">
                       <CalendarDays size={15} />
                       <span>Due {formatDate(project.dueDate)}</span>
@@ -171,7 +171,7 @@ function ProjectList({
                         "noopener,noreferrer"
                       )
                     }
-                    className="shrink-0 rounded-lg bg-violet-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-violet-700 dark:bg-violet-600 dark:hover:bg-violet-500"
+                    className="btn-primary shrink-0 rounded-lg px-3 py-2 text-xs font-semibold transition"
                   >
                     View
                   </button>

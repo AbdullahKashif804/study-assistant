@@ -22,7 +22,9 @@ const showDashboard = async (req,res) => {
     totalDailyTask,
     todaysDailyTask,
     totalToDoTask,
-    pendingToDoTask
+pendingToDoTask,
+dailyTaskStatus,
+todoTaskStatus
 ] = await Promise.all([
     noteModel.countDocuments({
         user: req.user._id
@@ -77,11 +79,65 @@ const showDashboard = async (req,res) => {
     }),
 
     todoTaskModel.find({
-        user: req.user._id,
-        status: "Pending",
-        dueDate: { $gte: new Date() }
-    }).sort({ dueDate: 1 }).limit(5)
+    user: req.user._id,
+    status: "Pending",
+    dueDate: { $gte: new Date() }
+}).sort({ dueDate: 1 }).limit(5),
+
+dailyTaskModel.aggregate([
+    {
+        $match: {
+            user: req.user._id
+        }
+    },
+    {
+        $group: {
+            _id: "$status",
+            count: { $sum: 1 }
+        }
+    }
+]),
+
+todoTaskModel.aggregate([
+    {
+        $match: {
+            user: req.user._id
+        }
+    },
+    {
+        $group: {
+            _id: "$status",
+            count: { $sum: 1 }
+        }
+    }
+])
 ]);
+
+const taskStatus = {
+    pending: 0,
+    inProgress: 0,
+    completed: 0
+};
+
+
+const addStatusCounts = (items) => {
+    items.forEach((item) => {
+        if (item._id === "Pending") {
+            taskStatus.pending += item.count;
+        }
+
+        if (item._id === "In Progress") {
+            taskStatus.inProgress += item.count;
+        }
+
+        if (item._id === "Completed") {
+            taskStatus.completed += item.count;
+        }
+    });
+};
+
+addStatusCounts(dailyTaskStatus);
+addStatusCounts(todoTaskStatus);
         return res.status(200).json({
             success:true,
             data:{
@@ -97,7 +153,8 @@ const showDashboard = async (req,res) => {
                 totalDailyTask,
                 todaysDailyTask,
                 totalToDoTask,
-                pendingToDoTask
+pendingToDoTask,
+taskStatus
             }
         })
     }catch(error){

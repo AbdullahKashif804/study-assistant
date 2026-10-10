@@ -1,3 +1,5 @@
+import ModuleLayout, { ModuleColumns, ModuleRecords } from "../../components/ui/ModuleLayout";
+import useFormDraft from "../../hooks/useFormDraft";
 import {
   CheckCircle2,
   ClipboardCheck,
@@ -5,8 +7,6 @@ import {
   Flag,
 } from "lucide-react";
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
-import DashboardHeader from "../../components/dashboard/DashboardHeader";
-import DashboardSidebar from "../../components/dashboard/DashboardSidebar";
 import DailyTaskToolbar from "../../components/dailyTasks/DailyTaskToolbar";
 import StatCard from "../../components/dailyTasks/DailyTaskStats";
 import DailyTaskForm from "../../components/dailyTasks/DailyTaskForm";
@@ -60,6 +60,8 @@ function DailyTasks() {
   const formSectionRef = useRef(null);
   const titleInputRef = useRef(null);
 
+  const confirmDiscard = useFormDraft(form, null, emptyForm);
+
   const token = localStorage.getItem("token");
 
   const fetchTasks = useCallback(async () => {
@@ -109,7 +111,7 @@ function DailyTasks() {
 
   useEffect(() => {
     if (isFormOpen) {
-      formSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      if (window.matchMedia("(min-width: 1024px)").matches) { formSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }); }
       titleInputRef.current?.focus();
     }
   }, [isFormOpen]);
@@ -122,6 +124,7 @@ function DailyTasks() {
   }
 
   function handleNewTask() {
+    if (submitting || !confirmDiscard()) return;
     setForm(emptyForm);
     setEditId(null);
     setOpenMenuId(null);
@@ -131,6 +134,7 @@ function DailyTasks() {
   }
 
   function handleEdit(task) {
+    if (submitting || !confirmDiscard()) return;
     setEditId(task._id);
     setForm({
       title: task.title || "",
@@ -318,15 +322,10 @@ function DailyTasks() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 transition-colors dark:bg-slate-950 lg:flex">
-      <DashboardSidebar
-        isSidebarOpen={isSidebarOpen}
-        setIsSidebarOpen={setIsSidebarOpen}
-      />
-      <div className="min-w-0 flex-1">
-        <DashboardHeader setIsSidebarOpen={setIsSidebarOpen} />
-        <main className="mx-auto max-w-7xl px-4 mt-20 py-6 sm:px-6 lg:pl-68">
+    <ModuleLayout isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen}>
           <DailyTaskToolbar
+
+            busy={submitting}
             search={search}
             setSearch={setSearch}
             priorityFilter={priorityFilter}
@@ -340,18 +339,18 @@ function DailyTasks() {
           />
 
           {error && (
-            <div className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 dark:border-red-900/50 dark:bg-red-950/50 dark:text-red-400">
+            <div className="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 dark:border-red-900/50 dark:bg-red-950/50 dark:text-red-400">
               {error}
             </div>
           )}
           {successMessage && (
-            <div className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/50 dark:text-emerald-400">
+            <div className="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/50 dark:text-emerald-400">
               {successMessage}
             </div>
           )}
 
           <div className="mt-6">
-            <section className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <section className="mb-6 grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
               <StatCard
                 title="Total Tasks"
                 value={taskStats.total}
@@ -383,9 +382,16 @@ function DailyTasks() {
             </section>
           </div>
 
-          <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_400px]">
-            <section className="overflow-visible rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
-              <div className="border-b border-slate-200 p-4 dark:border-slate-800">
+          <ModuleColumns>
+            <ModuleRecords title="Daily Tasks" pagination={!fetching && (
+                <DailyTaskPagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  totalItems={totalItems}
+                  setCurrentPage={setCurrentPage}
+                />
+              )}>
+              <div className="min-w-0">
                 <DailyTaskList
                   tasks={tasks}
                   fetching={fetching}
@@ -400,18 +406,10 @@ function DailyTasks() {
                   formatDate={formatDate}
                 />
               </div>
-
-              {!fetching && tasks.length > 0 && (
-                <DailyTaskPagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  totalItems={totalItems}
-                  setCurrentPage={setCurrentPage}
-                />
-              )}
-            </section>
-
+            </ModuleRecords>
             <DailyTaskForm
+              error={error}
+              confirmDiscard={confirmDiscard}
               form={form}
               handleChange={handleChange}
               handleSubmit={handleSubmit}
@@ -425,17 +423,9 @@ function DailyTasks() {
               setForm={setForm}
             />
 
-            {isFormOpen && (
-              <button
-                type="button"
-                onClick={() => setIsFormOpen(false)}
-                className="fixed inset-0 z-40 bg-slate-950/40 backdrop-blur-xs xl:hidden dark:bg-slate-950/70"
-              />
-            )}
-          </div>
-        </main>
-      </div>
-    </div>
+
+          </ModuleColumns>
+            </ModuleLayout>
   );
 }
 

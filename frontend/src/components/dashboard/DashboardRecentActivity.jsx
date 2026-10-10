@@ -32,6 +32,7 @@ function DashboardRecentActivity({ dashboardData }) {
         ...upcomingAssignment.map((item) => ({
             id: `assign-${item._id || item.id}`,
             title: item.title,
+            date: item.dueDate,
             meta: item.dueDate
                 ? `Due ${new Date(item.dueDate).toLocaleDateString("en-US", {
                       month: "short",
@@ -41,7 +42,7 @@ function DashboardRecentActivity({ dashboardData }) {
             type: "Assignment",
             icon: ClipboardList,
             badgeStyles:
-                "bg-green-50 text-green-700 border-green-100 dark:bg-green-950/50 dark:text-green-400 dark:border-green-900/60"
+                "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/50 dark:text-emerald-400 dark:border-emerald-900/60"
         })),
 
         ...upComingProject.map((item) => ({
@@ -95,6 +96,32 @@ function DashboardRecentActivity({ dashboardData }) {
         }))
     ];
 
+    const priorityTypes = [
+    "Assignment",
+    "Project",
+    "Quiz",
+    "Daily Task",
+    "To-Do"
+];
+
+const sortedActivities = [...Activities].sort((a, b) => {
+    const aPriority = priorityTypes.includes(a.type) ? 0 : 1;
+    const bPriority = priorityTypes.includes(b.type) ? 0 : 1;
+
+    if (aPriority !== bPriority) {
+        return aPriority - bPriority;
+    }
+
+    const aDate = a.date ? new Date(a.date).getTime() : Infinity;
+    const bDate = b.date ? new Date(b.date).getTime() : Infinity;
+
+    if (aPriority === 0) {
+        return aDate - bDate;
+    }
+
+    return bDate - aDate;
+});
+
     return (
         <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 dark:shadow-none">
             <div className="mb-5">
@@ -113,7 +140,7 @@ function DashboardRecentActivity({ dashboardData }) {
                 </div>
             ) : (
                 <div className="space-y-3.5">
-                    {Activities.slice(0, 8).map((item) => {
+                    {Activities.slice(0, 5).map((item) => {
                         const Icon = item.icon;
 
                         return (

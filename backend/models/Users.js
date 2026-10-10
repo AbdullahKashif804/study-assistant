@@ -58,6 +58,11 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
 
+    accountDeletionPending: {
+      type: Boolean,
+      default: false,
+    },
+
     dateOfBirth: {
       type: Date,
       default: null,

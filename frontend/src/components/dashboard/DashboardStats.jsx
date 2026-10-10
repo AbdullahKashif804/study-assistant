@@ -19,7 +19,7 @@ function DashboardStats({ dashboardData }) {
             value: dashboardData?.totalAssignment ?? 0,
             icon: ClipboardList,
             description: "Total assignments",
-            color: "border-green-100 bg-green-50 text-green-600 dark:border-green-900/60 dark:bg-green-950/50 dark:text-green-400"
+            color: "border-emerald-100 bg-emerald-50 text-emerald-600 dark:border-emerald-900/60 dark:bg-emerald-950/50 dark:text-emerald-400"
         },
         {
             title: "Projects",

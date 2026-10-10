@@ -16,7 +16,7 @@ import DashboardHeader from "../../components/dashboard/DashboardHeader";
 function Settings() {
     const { theme, toggleTheme } = useTheme();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    
+
 const [showChangePassword, setShowChangePassword] = useState(false);
 
 const [currentPassword, setCurrentPassword] = useState("");
@@ -120,6 +120,7 @@ const handleDeleteAccount = async (event) => {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`,
                 },
+                body: JSON.stringify({ confirmation: deleteConfirmation }),
             }
         );
 
@@ -135,6 +136,7 @@ const handleDeleteAccount = async (event) => {
         setDeleteMessageType("success");
 
         localStorage.removeItem("token");
+        localStorage.removeItem("user");
 
         setTimeout(() => {
             window.location.href = "/login";
@@ -157,7 +159,7 @@ const handleDeleteAccount = async (event) => {
       />
       <div className="min-w-0 flex-1">
         <DashboardHeader setIsSidebarOpen={setIsSidebarOpen} />
-      <main className="mx-auto mt-20 max-w-7xl px-4 py-6 sm:px-6 lg:pl-68">
+      <main className="workspace-content ">
         <div className="max-w-4xl">
           <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
@@ -170,7 +172,7 @@ const handleDeleteAccount = async (event) => {
             </div>
             <Link
               to="/dashboard"
-              className="inline-flex shrink-0 items-center gap-2 text-sm font-medium text-blue-600 transition-colors hover:text-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-100 dark:text-blue-400 dark:hover:text-blue-300 dark:focus:ring-blue-950/50"
+              className="inline-flex shrink-0 items-center gap-2 text-sm font-medium text-blue-600 transition-colors hover:text-blue-700 focus:outline-none focus:ring-4 focus:ring-indigo-500 dark:text-blue-400 dark:hover:text-blue-300 dark:focus:ring-indigo-500"
             >
               <ArrowLeft className="h-4 w-4" />
               Back to Dashboard
@@ -209,7 +211,7 @@ const handleDeleteAccount = async (event) => {
   onClick={toggleTheme}
   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
     theme === "dark"
-      ? "bg-blue-600"
+      ? "bg-indigo-600"
       : "bg-gray-300 dark:bg-slate-700"
   }`}
   aria-label="Toggle dark mode"
@@ -256,13 +258,13 @@ const handleDeleteAccount = async (event) => {
                 </p>
               </div>
 
-              
+
 <button
     type="button"
     onClick={toggleDeadlineNotifications}
     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
         deadlineNotificationsEnabled
-            ? "bg-blue-600"
+            ? "bg-indigo-600"
             : "bg-gray-300 dark:bg-slate-700"
     }`}
     aria-label="Toggle deadline notifications"
@@ -322,7 +324,7 @@ const handleDeleteAccount = async (event) => {
         setShowChangePassword(true);
         setPasswordMessage("");
     }}
-    className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-4 focus:ring-blue-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 dark:focus:ring-blue-950/50"
+    className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-4 focus:ring-indigo-500 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 dark:focus:ring-indigo-500"
 >
     Change
 </button>
@@ -347,7 +349,7 @@ const handleDeleteAccount = async (event) => {
                     onChange={(event) =>
                         setCurrentPassword(event.target.value)
                     }
-                    className="w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none transition-colors focus:border-blue-500 focus:ring-4 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:focus:ring-blue-950/50"
+                    className="w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none transition-colors focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:focus:ring-indigo-500"
                     placeholder="Enter current password"
                 />
             </div>
@@ -364,7 +366,7 @@ const handleDeleteAccount = async (event) => {
                     onChange={(event) =>
                         setNewPassword(event.target.value)
                     }
-                    className="w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none transition-colors focus:border-blue-500 focus:ring-4 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:focus:ring-blue-950/50"
+                    className="w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none transition-colors focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:focus:ring-indigo-500"
                     placeholder="Enter new password"
                 />
             </div>
@@ -381,7 +383,7 @@ const handleDeleteAccount = async (event) => {
                     onChange={(event) =>
                         setConfirmPassword(event.target.value)
                     }
-                    className="w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none transition-colors focus:border-blue-500 focus:ring-4 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:focus:ring-blue-950/50"
+                    className="w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none transition-colors focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:focus:ring-indigo-500"
                     placeholder="Confirm new password"
                 />
             </div>
@@ -391,7 +393,7 @@ const handleDeleteAccount = async (event) => {
                 <p
                     className={`text-sm ${
                         passwordMessageType === "success"
-                            ? "text-green-600 dark:text-green-400"
+                            ? "text-emerald-600 dark:text-emerald-400"
                             : "text-red-600 dark:text-red-400"
                     }`}
                 >
@@ -411,7 +413,7 @@ const handleDeleteAccount = async (event) => {
                         setNewPassword("");
                         setConfirmPassword("");
                     }}
-                    className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-blue-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 dark:focus:ring-blue-950/50"
+                    className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-indigo-500 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 dark:focus:ring-indigo-500"
                 >
                     Cancel
                 </button>
@@ -419,7 +421,7 @@ const handleDeleteAccount = async (event) => {
                 <button
                     type="submit"
                     disabled={changingPassword}
-                    className="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-100 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-blue-600 dark:hover:bg-blue-500 dark:focus:ring-blue-950/50"
+                    className="btn-primary rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors focus:outline-none focus:ring-4 disabled:cursor-not-allowed"
                 >
                     {changingPassword
                         ? "Changing..."
@@ -498,7 +500,7 @@ const handleDeleteAccount = async (event) => {
                 <p
                     className={`text-sm ${
                         deleteMessageType === "success"
-                            ? "text-green-600 dark:text-green-400"
+                            ? "text-emerald-600 dark:text-emerald-400"
                             : "text-red-600 dark:text-red-400"
                     }`}
                 >
@@ -515,7 +517,7 @@ const handleDeleteAccount = async (event) => {
                         setDeleteConfirmation("");
                         setDeleteMessage("");
                     }}
-                    className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-blue-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 dark:focus:ring-blue-950/50"
+                    className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-indigo-500 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 dark:focus:ring-indigo-500"
                 >
                     Cancel
                 </button>
@@ -570,7 +572,7 @@ const handleDeleteAccount = async (event) => {
 
     <Link
       to="/privacy-policy"
-      className="shrink-0 rounded-xl border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-4 focus:ring-blue-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 dark:focus:ring-blue-950/50"
+      className="shrink-0 rounded-xl border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-4 focus:ring-indigo-500 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 dark:focus:ring-indigo-500"
     >
       View Policy
     </Link>

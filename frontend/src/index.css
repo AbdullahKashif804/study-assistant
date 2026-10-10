@@ -2,6 +2,177 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+@layer components {
+    .workspace-content {
+        width: 100%;
+        max-width: 80rem;
+        margin-inline: auto;
+        padding: 5.5rem 1rem 1.5rem;
+    }
+
+    .module-form {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        max-width: none;
+        height: 100dvh;
+        max-height: 100dvh;
+        margin: 0;
+        padding: 0 0 env(safe-area-inset-bottom);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        @apply border-0 bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100;
+    }
+
+    .module-form::backdrop {
+        background: rgb(2 6 23 / 60%);
+        backdrop-filter: blur(3px);
+    }
+
+    .navigation-drawer { border-width: 0 1px 0 0; }
+    .navigation-drawer[open] { display: flex; }
+    .navigation-drawer::backdrop { background: rgb(2 6 23 / 60%); }
+
+    .app-modal {
+        position: fixed;
+        inset: 0;
+        width: calc(100% - 2rem);
+        max-width: 42rem;
+        max-height: calc(100dvh - 2rem);
+        margin: auto;
+        padding: 0;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        @apply rounded-2xl border border-slate-200 bg-white text-slate-900 shadow-2xl dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100;
+    }
+    .app-modal::backdrop { background: rgb(2 6 23 / 60%); backdrop-filter: blur(3px); }
+
+    .module-card {
+        @apply relative min-w-0 rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-indigo-200 hover:shadow-sm dark:border-slate-800 dark:bg-slate-900 dark:hover:border-indigo-900 sm:p-5;
+    }
+
+    .module-toolbar {
+        @apply mt-6 grid min-w-0 grid-cols-1 gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900;
+    }
+
+    .module-pagination {
+        @apply flex flex-col gap-3 border-t border-slate-200 p-4 dark:border-slate-800 sm:flex-row sm:items-center sm:justify-between;
+    }
+
+    .pagination-button {
+        @apply inline-flex items-center justify-center gap-1 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-indigo-500 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800;
+    }
+
+    @media (min-width: 640px) {
+        .workspace-content { padding-inline: 1.5rem; }
+        .module-toolbar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .module-toolbar > :first-child { grid-column: 1 / -1; }
+    }
+
+    @media (min-width: 768px) and (max-width: 1023px) {
+        .module-form {
+            inset: 0;
+            width: calc(100% - 3rem);
+            max-width: 40rem;
+            height: auto;
+            max-height: calc(100dvh - 3rem);
+            margin: auto;
+            @apply rounded-2xl border border-slate-200 shadow-2xl dark:border-slate-800;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .workspace-content {
+            width: calc(100% - 16rem);
+            margin-inline-start: max(16rem, calc((100% + 16rem - 80rem) / 2));
+            margin-inline-end: auto;
+        }
+        .module-form {
+            position: sticky;
+            inset: auto;
+            top: 5.5rem;
+            width: 100%;
+            height: auto;
+            max-height: calc(100dvh - 7rem);
+            margin: 0;
+            align-self: start;
+            scroll-margin-top: 5.5rem;
+            @apply rounded-2xl border border-slate-200 shadow-sm dark:border-slate-800;
+        }
+    }
+
+    @media (min-width: 1280px) {
+        .module-toolbar { display: flex; flex-wrap: wrap; align-items: center; }
+        .module-toolbar > :first-child { flex: 1 1 16rem; }
+    }
+}
+
+/* Scoped presentation keeps each module's existing field and API behavior. */
+@layer utilities {
+    .module-form .module-fields { min-width: 0; margin: 0; border: 0; border-radius: 0; box-shadow: none; }
+    .module-form label { @apply block text-xs font-semibold text-slate-700 dark:text-slate-300; }
+    .module-form :is(input, select, textarea):not([type="checkbox"]):not([type="file"]) {
+        min-width: 0;
+        max-width: 100%;
+        @apply mt-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100;
+    }
+    .module-form :is(input, select, textarea):focus {
+        outline: 2px solid var(--color-indigo-500);
+        outline-offset: 1px;
+        box-shadow: none;
+    }
+    .module-form :is(input, select, textarea):disabled { opacity: 0.6; cursor: not-allowed; }
+    .module-form input[type="file"] { min-width: 0; max-width: 100%; }
+    .module-form p { overflow-wrap: anywhere; }
+    .module-form .module-fields > .mt-5 { margin-top: 1rem; }
+    .module-form .module-fields > .mt-5:first-child { margin-top: 0; }
+    .module-toolbar :is(input, select) { width: 100%; min-width: 0; min-height: 2.875rem; }
+    .module-toolbar > select { width: 100%; }
+    .module-toolbar > .flex { min-width: 0; flex-wrap: wrap; }
+    .module-toolbar > .flex { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .module-toolbar > .grid { grid-column: 1 / -1; min-width: 0; }
+    .module-records { min-width: 0; }
+    .module-records article { overflow-wrap: anywhere; }
+    .module-records article :is(h2, h3) { @apply line-clamp-2 whitespace-normal; overflow-wrap: anywhere; }
+    .module-records article > :last-child { min-width: 0; }
+    @media (min-width: 1280px) {
+        .module-toolbar > select { width: auto; max-width: 16rem; }
+        .module-toolbar > .flex { display: flex; flex: 1 1 24rem; }
+        .module-toolbar > .flex > select { flex: 1 1 9rem; width: auto; }
+        .module-toolbar > .grid { display: flex; flex: 1 1 24rem; flex-wrap: wrap; }
+        .module-toolbar > .grid > select { flex: 1 1 9rem; width: auto; }
+    }
+    @media (min-width: 1024px) and (max-width: 1279px) {
+        .module-records article > .flex > .hidden { display: none; }
+    }
+    @media (max-width: 767px) {
+        .module-form :is(input, select, textarea):not([type="checkbox"]):not([type="file"]) { font-size: 1rem; }
+    }
+    @media (max-width: 399px) {
+        .module-form .grid.grid-cols-2 { grid-template-columns: minmax(0, 1fr); }
+    }
+}
+
+/* Shared primary action colors; each component retains its layout utilities. */
+@layer components {
+    .btn-primary {
+        @apply bg-indigo-600 text-white focus:ring-indigo-500;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+        @apply bg-indigo-700;
+    }
+
+    .btn-primary:focus-visible {
+        outline: 2px solid var(--color-indigo-500);
+        outline-offset: 2px;
+    }
+
+    .btn-primary:disabled {
+        @apply cursor-not-allowed opacity-60;
+    }
+}
+
 @layer base {
     :root {
         color-scheme: light;

@@ -1,3 +1,4 @@
+import Modal from "../ui/Modal";
 import {
     X,
     Bell,
@@ -23,7 +24,7 @@ function DeadlinePopup({ reminders, onClose }) {
         }
 
         if (type === "Quiz") {
-            return <BookOpen className="h-5 w-5 text-green-600 dark:text-green-400" />;
+            return <BookOpen className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />;
         }
 
         if (type === "To-do") {
@@ -34,20 +35,7 @@ function DeadlinePopup({ reminders, onClose }) {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 backdrop-blur-sm dark:bg-black/70">
-
-            <div
-                className="
-                    relative w-full max-w-lg
-                    rounded-2xl
-                    bg-white
-                    shadow-2xl
-                    dark:border
-                    dark:border-slate-800
-                    dark:bg-slate-900
-                    dark:shadow-black/50
-                "
-            >
+        <Modal title="Today's Deadlines" onClose={onClose}>
 
                 {/* Header */}
                 <div
@@ -160,20 +148,13 @@ function DeadlinePopup({ reminders, onClose }) {
                 >
                     <button
                         onClick={onClose}
-                        className="
-                            rounded-xl bg-blue-600 px-4 py-2
-                            text-sm font-medium text-white
-                            transition-colors hover:bg-blue-700
-                            dark:bg-blue-600 dark:hover:bg-blue-500
-                        "
+                        className="btn-primary rounded-xl px-4 py-2 text-sm font-medium transition-colors"
                     >
                         Got it
                     </button>
                 </div>
 
-            </div>
-
-        </div>
+        </Modal>
     );
 }
 

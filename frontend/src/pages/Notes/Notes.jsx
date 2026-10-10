@@ -1,10 +1,11 @@
+import useFormDraft from "../../hooks/useFormDraft";
+import ModuleLayout, { ModuleColumns, ModuleRecords } from "../../components/ui/ModuleLayout";
 import { useState, useEffect, useRef } from "react";
-import DashboardHeader from "../../components/dashboard/DashboardHeader";
-import DashboardSidebar from "../../components/dashboard/DashboardSidebar";
 import NotesToolbar from "../../components/notes/NotesToolbar";
 import NoteForm from "../../components/notes/NoteForm";
 import NotesList from "../../components/notes/NotesList";
 import NotePagination from "../../components/notes/NotePagination";
+import NotesAI from "../../components/notes/NotesAI";
 
 const API_URL = "http://localhost:5000/api/note";
 
@@ -46,7 +47,9 @@ function Notes() {
     const formSectionRef = useRef(null);
     const titleInputRef = useRef(null);
 
-    const token = localStorage.getItem("token");
+    const confirmDiscard = useFormDraft(form, attachment, emptyForm);
+
+  const token = localStorage.getItem("token");
 
     useEffect(() => {
         async function fetchNotes() {
@@ -140,6 +143,7 @@ function Notes() {
     }
 
     function OpenCreateForm() {
+    if (submitting || !confirmDiscard()) return;
         setForm(emptyForm);
         setAttachment(null);
         setEditId(null);
@@ -149,15 +153,16 @@ function Notes() {
         setIsFormOpen(true);
 
         setTimeout(() => {
-            formSectionRef.current?.scrollIntoView({
+            if (window.matchMedia("(min-width: 1024px)").matches) { formSectionRef.current?.scrollIntoView({
                 behavior: "smooth",
                 block: "start",
-            });
+            }); }
             titleInputRef.current?.focus();
         }, 100);
     }
 
     function handleEdit(note) {
+    if (submitting || !confirmDiscard()) return;
         setEditId(note._id);
         setForm({
             title: note.title || "",
@@ -171,10 +176,10 @@ function Notes() {
         setIsFormOpen(true);
 
         setTimeout(() => {
-            formSectionRef.current?.scrollIntoView({
+            if (window.matchMedia("(min-width: 1024px)").matches) { formSectionRef.current?.scrollIntoView({
                 behavior: "smooth",
                 block: "start",
-            });
+            }); }
             titleInputRef.current?.focus();
         }, 100);
     }
@@ -308,101 +313,85 @@ function Notes() {
 
     function getCardStyle(index) {
         const styles = [
-            { border: "border-t-blue-500", icon: "bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400" },
-            { border: "border-t-emerald-500", icon: "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400" },
-            { border: "border-t-violet-500", icon: "bg-violet-50 text-violet-600 dark:bg-violet-950/50 dark:text-violet-400" },
-            { border: "border-t-amber-500", icon: "bg-amber-50 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400" },
+            { icon: "bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400" },
+            { icon: "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400" },
+            { icon: "bg-violet-50 text-violet-600 dark:bg-violet-950/50 dark:text-violet-400" },
+            { icon: "bg-amber-50 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400" },
         ];
 
         return styles[index % styles.length];
     }
 
     return (
-        <main className="flex min-h-screen bg-slate-100 dark:bg-slate-950">
-            {/* Sidebar */}
-            <DashboardSidebar
-                isSidebarOpen={isSidebarOpen}
-                setIsSidebarOpen={setIsSidebarOpen}
+        <ModuleLayout isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen}>
+            <NotesToolbar
+                busy={submitting}
+                search={search}
+                setSearch={handleSearchChange}
+                sortOrder={sortOrder}
+                setSortOrder={handleSortChange}
+                courseFilter={courseFilter}
+                setCourseFilter={handleCourseChange}
+                courses={courses}
+                OpenCreateForm={OpenCreateForm}
             />
 
-            {/* Header */}
-            <DashboardHeader setIsSidebarOpen={setIsSidebarOpen} />
+            {error && (
+                <div className="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-400">
+                    {error}
+                </div>
+            )}
+            {successMessage && (
+                <div className="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/40 dark:text-emerald-400">
+                    {successMessage}
+                </div>
+            )}
 
-            {/* Main Content */}
-            <div className="min-w-0 flex-1">
-                <section className="mx-auto mt-20 max-w-7xl px-4 py-6 sm:px-6 lg:pl-68">
-                    {/* Toolbar */}
-                    <NotesToolbar
-                        search={search}
-                        setSearch={handleSearchChange}
-                        sortOrder={sortOrder}
-                        setSortOrder={handleSortChange}
-                        courseFilter={courseFilter}
-                        setCourseFilter={handleCourseChange}
+            <div className="mt-6">
+                <ModuleColumns>
+                    <ModuleRecords title="Notes" pagination={!loading && (
+                        <NotePagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            totalItems={totalItems}
+                            setCurrentPage={setCurrentPage}
+                        />
+                    )}>
+                        <NotesList
+                            loading={loading}
+                            search={search}
+                            notes={notes}
+                            openCreateForm={OpenCreateForm}
+                            getCardStyle={getCardStyle}
+                            openMenuId={openMenuId}
+                            setOpenMenuId={setOpenMenuId}
+                            deletingId={deletingId}
+                            handleEdit={handleEdit}
+                            handleDelete={handleDelete}
+                            formatDate={formatDate}
+                        />
+                    </ModuleRecords>
+                    <NoteForm
+                        setIsFormOpen={setIsFormOpen}
+                        error={error}
+                        confirmDiscard={confirmDiscard}
+                        form={form}
+                        handleChange={handleChange}
+                        handleSubmit={handleSubmit}
+                        attachment={attachment}
+                        handleAttachmentChange={handleAttachmentChange}
+                        editId={editId}
+                        submitting={submitting}
+                        resetForm={resetForm}
+                        isFormOpen={isFormOpen}
+                        formSectionRef={formSectionRef}
+                        titleInputRef={titleInputRef}
                         courses={courses}
-                        notes={notes}
-                        OpenCreateForm={OpenCreateForm}
                     />
-
-                    {/* Error Message */}
-                    {error && (
-                        <div className="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-400">
-                            {error}
-                        </div>
-                    )}
-
-                    {/* Success Message */}
-                    {successMessage && (
-                        <div className="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/40 dark:text-emerald-400">
-                            {successMessage}
-                        </div>
-                    )}
-
-                    {/* Notes + Form Grid */}
-                    <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-3">
-                        <div className="xl:col-span-2">
-                            <NotesList
-                                loading={loading}
-                                search={search}
-                                notes={notes}
-                                OpenCreateForm={OpenCreateForm}
-                                getCardStyle={getCardStyle}
-                                openMenuId={openMenuId}
-                                setOpenMenuId={setOpenMenuId}
-                                deletingId={deletingId}
-                                handleEdit={handleEdit}
-                                handleDelete={handleDelete}
-                                formatDate={formatDate}
-                            />
-
-                            <NotePagination
-                                currentPage={currentPage}
-                                totalPages={totalPages}
-                                totalItems={totalItems}
-                                setCurrentPage={setCurrentPage}
-                            />
-                        </div>
-
-                        <div className="xl:sticky xl:top-24 xl:max-h-[calc(100vh-6rem)] xl:self-start xl:overflow-y-auto xl:overscroll-contain">
-                            <NoteForm
-                                form={form}
-                                handleChange={handleChange}
-                                handleSubmit={handleSubmit}
-                                attachment={attachment}
-                                handleAttachmentChange={handleAttachmentChange}
-                                editId={editId}
-                                submitting={submitting}
-                                resetForm={resetForm}
-                                isFormOpen={isFormOpen}
-                                formSectionRef={formSectionRef}
-                                titleInputRef={titleInputRef}
-                                courses={courses}
-                            />
-                        </div>
-                    </div>
-                </section>
+                </ModuleColumns>
             </div>
-        </main>
+            <div className="mt-6"><NotesAI /></div>
+        </ModuleLayout>
     );
 }
 

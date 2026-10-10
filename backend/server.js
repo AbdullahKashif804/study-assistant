@@ -12,6 +12,7 @@ const ToDoTask = require('./routes/todoTaskRoute')
 const Dashboard = require('./routes/dashboardRoute')
 const adminRoutes = require('./routes/adminRoutes');
 const globalSearchRoutes = require("./routes/globalSearchRoutes");
+const aiRoutes = require("./routes/aiRoute");
 const cors=require('cors');
 
 const connectDB=require("./config/db")
@@ -38,6 +39,7 @@ app.use('/api/todoTask',ToDoTask)
 app.use('/api/dashboard',Dashboard)
 app.use('/api/admin', adminRoutes);
 app.use("/api/search", globalSearchRoutes);
+app.use("/api/ai", aiRoutes);
 app.listen(PORT,()=>{
     console.log(`Server is running on ${PORT}`)
 })

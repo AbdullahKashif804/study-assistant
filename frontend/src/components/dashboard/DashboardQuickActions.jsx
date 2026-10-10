@@ -21,7 +21,7 @@ function DashboardQuickActions() {
             label: "Add Assignment",
             description: "Track a new deadline",
             icon: PlusSquare,
-            color: "text-green-600 bg-green-50 border-green-100 hover:bg-green-100/50 dark:text-green-400 dark:bg-green-950/40 dark:border-green-900/50",
+            color: "text-emerald-600 bg-emerald-50 border-emerald-100 hover:bg-emerald-100/50 dark:text-emerald-400 dark:bg-emerald-950/40 dark:border-emerald-900/50",
             path: "/assignment"
         },
         {
@@ -59,7 +59,7 @@ function DashboardQuickActions() {
                             key={action.label}
                             type="button"
                             onClick={() => navigate(action.path)}
-                            className="flex items-center gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4 text-left transition-colors hover:border-slate-300 hover:bg-slate-100 focus:outline-none focus:ring-4 focus:ring-indigo-100 dark:border-slate-800 dark:bg-slate-800/50 dark:hover:border-slate-700 dark:hover:bg-slate-800 dark:focus:ring-indigo-950/50"
+                            className="flex items-center gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4 text-left transition-colors hover:border-slate-300 hover:bg-slate-100 focus:outline-none focus:ring-4 focus:ring-indigo-500 dark:border-slate-800 dark:bg-slate-800/50 dark:hover:border-slate-700 dark:hover:bg-slate-800 dark:focus:ring-indigo-500"
                         >
                             <div
                                 className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border transition-colors ${action.color}`}

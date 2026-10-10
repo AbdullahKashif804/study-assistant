@@ -19,6 +19,14 @@ const authMiddleware=async (req,res,next)=>{
         message: "User not found"
     });
         }
+        const isDeletionRetry = req.method === "DELETE" &&
+            req.baseUrl === "/api/user" && req.path === "/delete-account";
+        if (user.accountDeletionPending && !isDeletionRetry) {
+            return res.status(409).json({
+                success: false,
+                message: "Account deletion is pending. Retry permanent deletion in Settings."
+            });
+        }
         req.user=user;
         next()
     }catch(error){

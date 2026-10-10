@@ -1,3 +1,6 @@
+import ModuleLayout, { ModuleColumns, ModuleRecords } from "../../components/ui/ModuleLayout";
+import Pagination from "../../components/ui/Pagination";
+import useFormDraft from "../../hooks/useFormDraft";
 import {
   AlertCircle,
   CheckCircle2,
@@ -5,8 +8,6 @@ import {
   Clock3,
 } from "lucide-react";
 import { useState, useEffect, useMemo, useRef } from "react";
-import DashboardHeader from "../../components/dashboard/DashboardHeader";
-import DashboardSidebar from "../../components/dashboard/DashboardSidebar";
 import QuizForm from "../../components/quizzes/QuizForm";
 import QuizList from "../../components/quizzes/QuizList";
 import QuizToolbar from "../../components/quizzes/QuizToolbar";
@@ -56,6 +57,8 @@ function Quizzes() {
 
   const formSectionRef = useRef(null);
   const titleInputRef = useRef(null);
+
+  const confirmDiscard = useFormDraft(form, null, emptyForm);
 
   const token = localStorage.getItem("token");
 
@@ -136,16 +139,17 @@ function Quizzes() {
     setIsFormOpen(true);
 
     setTimeout(() => {
-      formSectionRef.current?.scrollIntoView({
+      if (window.matchMedia("(min-width: 1024px)").matches) { formSectionRef.current?.scrollIntoView({
         behavior: "smooth",
         block: "center",
-      });
+      }); }
 
       titleInputRef.current?.focus();
     }, 0);
   }
 
   function handleNewQuiz() {
+    if (submitting || !confirmDiscard()) return;
     setForm(emptyForm);
     setEditId(null);
     setOpenMenuId(null);
@@ -155,6 +159,7 @@ function Quizzes() {
   }
 
   function handleEdit(quiz) {
+    if (submitting || !confirmDiscard()) return;
     setEditId(quiz._id);
 
     setForm({
@@ -348,16 +353,10 @@ function Quizzes() {
   }
 
   return (
-    <>
-      <div className="min-h-screen bg-slate-100 dark:bg-slate-950 lg:flex">
-        <DashboardSidebar
-          isSidebarOpen={isSidebarOpen}
-          setIsSidebarOpen={setIsSidebarOpen}
-        />
-        <div className="min-w-0 flex-1">
-          <DashboardHeader setIsSidebarOpen={setIsSidebarOpen} />
-          <main className="mx-auto max-w-7xl px-4 mt-20 py-6 sm:px-6 lg:pl-68">
+    <ModuleLayout isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen}>
             <QuizToolbar
+
+            busy={submitting}
               search={search}
               setSearch={setSearch}
               courseFilter={courseFilter}
@@ -371,17 +370,17 @@ function Quizzes() {
               handleNewQuiz={handleNewQuiz}
             />
             {error && (
-              <div className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-400">
+              <div className="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-400">
                 {error}
               </div>
             )}
             {successMessage && (
-              <div className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/40 dark:text-emerald-400">
+              <div className="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/40 dark:text-emerald-400">
                 {successMessage}
               </div>
             )}
             <div className="mt-6">
-              <section className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              <section className="mb-6 grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
                 <StatCard
                   title="Total Quizzes"
                   value={quizStats.total}
@@ -412,9 +411,9 @@ function Quizzes() {
                 />
               </section>
             </div>
-            <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_400px]">
-              <section className="overflow-visible rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                <div className="border-b border-slate-200 p-4 dark:border-slate-800"></div>
+            <ModuleColumns>
+              <ModuleRecords title="Quizzes" pagination={!fetching && <Pagination totalItems={quizzes.length} itemLabel="quiz" />}>
+
                 <QuizList
                   fetching={fetching}
                   quizzes={quizzes}
@@ -427,16 +426,10 @@ function Quizzes() {
                   handleDelete={handleDelete}
                   deletingId={deletingId}
                 />
-
-                {!fetching && quizzes.length > 0 && (
-                  <div className="border-t border-slate-200 px-5 py-4 dark:border-slate-800">
-                    <p className="text-sm text-slate-500 dark:text-slate-400">
-                      Showing {quizzes.length} of {quizzes.length} quizzes
-                    </p>
-                  </div>
-                )}
-              </section>
+              </ModuleRecords>
               <QuizForm
+              error={error}
+              confirmDiscard={confirmDiscard}
                 formSectionRef={formSectionRef}
                 isFormOpen={isFormOpen}
                 setIsFormOpen={setIsFormOpen}
@@ -449,18 +442,9 @@ function Quizzes() {
                 handleCancel={handleCancel}
                 courses={courses}
               />
-              {isFormOpen && (
-                <button
-                  type="button"
-                  onClick={() => setIsFormOpen(false)}
-                  className="fixed inset-0 z-40 bg-slate-950/40 backdrop-blur-xs xl:hidden dark:bg-slate-950/60"
-                />
-              )}
-            </div>
-          </main>
-        </div>
-      </div>
-    </>
+
+            </ModuleColumns>
+              </ModuleLayout>
   );
 }
 

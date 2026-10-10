@@ -1,7 +1,10 @@
-import { X, Save, LoaderCircle } from "lucide-react";
+import ModuleForm from "../ui/ModuleForm";
+import { Save, LoaderCircle } from "lucide-react";
 
 function NoteForm({
   form,
+  error,
+  confirmDiscard,
   handleChange,
   handleSubmit,
   attachment,
@@ -10,51 +13,37 @@ function NoteForm({
   submitting,
   resetForm,
   isFormOpen,
+  setIsFormOpen,
   formSectionRef,
   titleInputRef,
   courses,
 }) {
   return (
     <>
-      <aside
-        ref={formSectionRef}
-        className={`${
-          isFormOpen
-            ? "fixed inset-0 z-50 overflow-y-auto overscroll-contain bg-slate-50 p-4 dark:bg-slate-950"
-            : "hidden"
-        } xl:static xl:z-auto xl:block xl:overflow-visible xl:bg-transparent xl:p-0`}
+      <ModuleForm
+        title={editId ? "Edit Note" : "Create Note"}
+        description={editId ? "Update your note details." : "Add a note to your study plan."}
+        isFormOpen={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
+        formSectionRef={formSectionRef}
+        titleInputRef={titleInputRef}
+        submitting={submitting}
+        error={error}
+        confirmDiscard={confirmDiscard}
+        attachment={attachment}
       >
         <form
           onSubmit={handleSubmit}
-          className="mx-auto max-w-xl rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900"
+          className="module-fields space-y-4 p-5"
         >
-          <div className="flex items-start justify-between border-b border-slate-200 pb-4 dark:border-slate-800">
-            <div>
-              <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">
-                {editId ? "Edit Note" : "Create Note"}
-              </h3>
-              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                {editId
-                  ? "Update the title or content of this note."
-                  : "Write and save a new study note."}
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={resetForm}
-              className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 xl:hidden dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
-              aria-label="Close form"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
 
-          <div className="mt-5">
+
+          <div>
             <label
               htmlFor="note-title"
               className="text-sm font-semibold text-slate-700 dark:text-slate-300"
             >
-              Note Title
+              Note Title <span className="text-red-600">*</span>
             </label>
             <input
               ref={titleInputRef}
@@ -64,12 +53,12 @@ function NoteForm({
               value={form.title}
               onChange={handleChange}
               placeholder="Enter note title"
-              className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:ring-indigo-950/50"
+              className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:ring-indigo-500"
               required
             />
           </div>
 
-          <div className="mt-5">
+          <div>
             <label
               htmlFor="note-course"
               className="text-sm font-semibold text-slate-700 dark:text-slate-300"
@@ -81,7 +70,7 @@ function NoteForm({
               name="course"
               value={form.course}
               onChange={handleChange}
-              className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:focus:border-indigo-500 dark:focus:ring-indigo-950/50"
+              className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:focus:border-indigo-500 dark:focus:ring-indigo-500"
             >
               <option value="" className="dark:bg-slate-900">
                 No Course
@@ -98,12 +87,12 @@ function NoteForm({
             </select>
           </div>
 
-          <div className="mt-5">
+          <div>
             <label
               htmlFor="note-content"
               className="text-sm font-semibold text-slate-700 dark:text-slate-300"
             >
-              Note Content
+              Note Content <span className="text-red-600">*</span>
             </label>
             <textarea
               id="note-content"
@@ -111,13 +100,13 @@ function NoteForm({
               value={form.content}
               onChange={handleChange}
               placeholder="Write your note here..."
-              rows="13"
-              className="mt-2 w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm leading-6 text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:ring-indigo-950/50"
+              rows="8"
+              className="mt-2 w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm leading-6 text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:ring-indigo-500"
               required
             />
           </div>
 
-          <div className="mt-5">
+          <div>
             <label
               htmlFor="note-attachment"
               className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300"
@@ -138,10 +127,11 @@ function NoteForm({
             )}
           </div>
 
+          <div className="flex flex-wrap gap-3 pt-2">
           <button
             type="submit"
             disabled={submitting}
-            className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-100 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-indigo-600 dark:hover:bg-indigo-500 dark:focus:ring-indigo-950/50"
+            className="btn-primary flex min-w-0 flex-1 items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition focus:outline-none focus:ring-4 disabled:cursor-not-allowed"
           >
             {submitting ? (
               <>
@@ -156,17 +146,16 @@ function NoteForm({
             )}
           </button>
 
-          {editId && (
             <button
               type="button"
-              onClick={resetForm}
-              className="mt-3 w-full rounded-xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800/60"
+              data-reset-form disabled={submitting} onClick={resetForm}
+              className="rounded-xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800/60"
             >
-              Cancel Edit
+              {editId ? "Cancel Edit" : isFormOpen ? "Cancel" : "Clear Form"}
             </button>
-          )}
+          </div>
         </form>
-      </aside>
+      </ModuleForm>
     </>
   );
 }

@@ -1,7 +1,10 @@
-import { Folder, X } from "lucide-react";
+import ModuleForm from "../ui/ModuleForm";
+
 
 function ProjectForm({
   form,
+  error,
+  confirmDiscard,
   handleChange,
   handleSubmit,
   attachment,
@@ -17,36 +20,23 @@ function ProjectForm({
 }) {
   return (
     <>
-      <aside
-        ref={formSectionRef}
-        className={`${
-          isFormOpen
-            ? "fixed inset-0 z-50 overflow-y-auto overscroll-contain bg-slate-100 p-4 dark:bg-slate-950"
-            : "hidden"
-        } xl:sticky xl:top-6 xl:z-auto xl:block xl:max-h-[calc(100vh-3rem)] xl:self-start xl:overflow-y-auto xl:overscroll-contain xl:bg-transparent xl:p-0`}
+      <ModuleForm
+        title={editId ? "Edit Project" : "Create Project"}
+        description={editId ? "Update your project details." : "Add a project to your study plan."}
+        isFormOpen={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
+        formSectionRef={formSectionRef}
+        titleInputRef={titleInputRef}
+        submitting={submitting}
+        error={error}
+        confirmDiscard={confirmDiscard}
+        attachment={attachment}
       >
         <form
           onSubmit={handleSubmit}
-          className="mx-auto max-w-xl rounded-2xl border border-slate-200 bg-white shadow-sm xl:max-w-none dark:border-slate-800 dark:bg-slate-900"
+          className="module-fields space-y-4 p-5"
         >
-          <div className="flex items-center justify-between border-b border-slate-200 p-5 dark:border-slate-800">
-            <div className="flex items-center gap-3">
-              <div className="rounded-xl bg-violet-100 p-2 text-violet-600 dark:bg-violet-950/60 dark:text-violet-400">
-                <Folder size={21} />
-              </div>
-              <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
-                {editId ? "Edit Project" : "Create New Project"}
-              </h2>
-            </div>
-            <button
-              type="button"
-              onClick={() => setIsFormOpen(false)}
-              className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 xl:hidden dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
-            >
-              <X size={20} />
-            </button>
-          </div>
-          <div className="space-y-4 p-5">
+
             <div>
               <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
                 Project Title <span className="text-red-500">*</span>
@@ -58,7 +48,7 @@ function ProjectForm({
                 value={form.title}
                 onChange={handleChange}
                 placeholder="Enter project title"
-                className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:ring-4 focus:ring-indigo-100 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-200 dark:placeholder-slate-500 dark:focus:ring-indigo-950/50"
+                className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:ring-4 focus:ring-indigo-500 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-200 dark:placeholder-slate-500 dark:focus:ring-indigo-500"
               />
             </div>
             <div>
@@ -71,7 +61,7 @@ function ProjectForm({
                 value={form.description}
                 onChange={handleChange}
                 placeholder="Enter project description..."
-                className="mt-2 w-full resize-none rounded-xl border border-slate-200 px-4 py-3 text-sm leading-6 outline-none transition focus:ring-4 focus:ring-indigo-100 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-200 dark:placeholder-slate-500 dark:focus:ring-indigo-950/50"
+                className="mt-2 w-full resize-none rounded-xl border border-slate-200 px-4 py-3 text-sm leading-6 outline-none transition focus:ring-4 focus:ring-indigo-500 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-200 dark:placeholder-slate-500 dark:focus:ring-indigo-500"
               />
             </div>
             <div>
@@ -82,7 +72,7 @@ function ProjectForm({
                 name="course"
                 value={form.course}
                 onChange={handleChange}
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:ring-4 focus:ring-indigo-100 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-200 dark:focus:ring-indigo-950/50"
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:ring-4 focus:ring-indigo-500 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-200 dark:focus:ring-indigo-500"
               >
                 <option value="" className="dark:bg-slate-900">
                   Select a course
@@ -108,7 +98,7 @@ function ProjectForm({
                 value={form.technologies}
                 onChange={handleChange}
                 placeholder="React, Node.js, MongoDB"
-                className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:ring-4 focus:ring-indigo-100 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-200 dark:placeholder-slate-500 dark:focus:ring-indigo-950/50"
+                className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:ring-4 focus:ring-indigo-500 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-200 dark:placeholder-slate-500 dark:focus:ring-indigo-500"
               />
               <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
                 Separate multiple technologies with commas.
@@ -125,7 +115,7 @@ function ProjectForm({
                   value={form.dueDate}
                   min={new Date().toISOString().split("T")[0]}
                   onChange={handleChange}
-                  className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:ring-4 focus:ring-indigo-100 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-200 dark:focus:ring-indigo-950/50 [color-scheme:light] dark:[color-scheme:dark]"
+                  className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:ring-4 focus:ring-indigo-500 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-200 dark:focus:ring-indigo-500 [color-scheme:light] dark:[color-scheme:dark]"
                 />
               </div>
               <div>
@@ -139,7 +129,7 @@ function ProjectForm({
                   value={form.totalMark}
                   onChange={handleChange}
                   placeholder="100"
-                  className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:ring-4 focus:ring-indigo-100 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-200 dark:placeholder-slate-500 dark:focus:ring-indigo-950/50"
+                  className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:ring-4 focus:ring-indigo-500 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-200 dark:placeholder-slate-500 dark:focus:ring-indigo-500"
                 />
               </div>
             </div>
@@ -154,7 +144,7 @@ function ProjectForm({
                 value={form.obtainedMark}
                 onChange={handleChange}
                 placeholder="Optional"
-                className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:ring-4 focus:ring-indigo-100 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-200 dark:placeholder-slate-500 dark:focus:ring-indigo-950/50"
+                className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:ring-4 focus:ring-indigo-500 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-200 dark:placeholder-slate-500 dark:focus:ring-indigo-500"
               />
             </div>
             <div>
@@ -166,7 +156,7 @@ function ProjectForm({
                 value={form.status}
                 onChange={handleChange}
                 disabled={!editId}
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:ring-4 focus:ring-indigo-100 disabled:cursor-not-allowed dark:border-slate-800 dark:bg-slate-800 dark:text-slate-200 dark:focus:ring-indigo-950/50 dark:disabled:bg-slate-800/40 dark:disabled:text-slate-500"
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:ring-4 focus:ring-indigo-500 disabled:cursor-not-allowed dark:border-slate-800 dark:bg-slate-800 dark:text-slate-200 dark:focus:ring-indigo-500 dark:disabled:bg-slate-800/40 dark:disabled:text-slate-500"
               >
                 <option value="In Progress" className="dark:bg-slate-900">
                   In Progress
@@ -206,11 +196,11 @@ function ProjectForm({
                 </p>
               )}
             </div>
-            <div className="space-y-3 pt-2">
+            <div className="flex flex-wrap gap-3 pt-2">
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-100 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-indigo-600 dark:hover:bg-indigo-500 dark:focus:ring-indigo-950/50"
+                className="btn-primary min-w-0 flex-1 rounded-xl px-4 py-3 text-sm font-semibold transition focus:outline-none focus:ring-4 disabled:cursor-not-allowed"
               >
                 {submitting
                   ? "Saving..."
@@ -220,15 +210,14 @@ function ProjectForm({
               </button>
               <button
                 type="button"
-                onClick={handleCancel}
-                className="w-full rounded-xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800"
+                data-reset-form disabled={submitting} onClick={handleCancel}
+                className="rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800"
               >
                 Clear Form
               </button>
             </div>
-          </div>
         </form>
-      </aside>
+      </ModuleForm>
     </>
   );
 }

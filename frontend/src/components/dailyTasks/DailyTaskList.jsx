@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import {
   CalendarDays,
   ClipboardCheck,
@@ -39,7 +39,7 @@ const TaskItem = ({
   }, [isMenuOpen, setOpenMenuId]);
 
   return (
-    <article className="relative border-b border-slate-100 p-4 last:border-b-0 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800/50 sm:p-5 transition-colors">
+    <article className="module-card">
       <div className="flex items-start gap-4">
         <input
           id={`task-${task._id}`}
@@ -51,7 +51,7 @@ const TaskItem = ({
         />
 
         <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <label
                 htmlFor={`task-${task._id}`}
@@ -63,37 +63,9 @@ const TaskItem = ({
               >
                 {task.title}
               </label>
-
-              {task.description && (
-                <p
-                  className={`mt-1 text-sm ${
-                    isCompleted
-                      ? "text-slate-400 line-through dark:text-slate-500"
-                      : "text-slate-600 dark:text-slate-400"
-                  }`}
-                >
-                  {task.description}
-                </p>
-              )}
-
-              <div className="mt-2 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                <CalendarDays size={15} />
-                <span>
-                  {formatDate ? formatDate(task.taskDate) : task.taskDate}
-                </span>
-              </div>
             </div>
 
             <div className="flex items-center gap-3">
-              <span
-                className={`rounded-full px-3 py-1 text-xs font-semibold ring-1 ring-inset ${
-                  priorityStyles[task.priority] ||
-                  priorityStyles.Medium ||
-                  "bg-slate-100 text-slate-700 ring-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700"
-                }`}
-              >
-                {task.priority || "Medium"}
-              </span>
 
               {/* Action Menu Dropdown */}
               <div className="relative" ref={menuRef}>
@@ -104,9 +76,11 @@ const TaskItem = ({
                       currentId === task._id ? null : task._id
                     )
                   }
-                  className="rounded-lg p-2 text-slate-400 hover:bg-slate-200 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
+                  className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
                   aria-label="Task options"
-                >
+
+                          aria-expanded={openMenuId === task._id}
+                        >
                   <MoreVertical size={19} />
                 </button>
 
@@ -138,6 +112,37 @@ const TaskItem = ({
               </div>
             </div>
           </div>
+
+
+              {task.description && (
+                <p
+                  className={`mt-3 line-clamp-2 text-sm leading-6 ${
+                    isCompleted
+                      ? "text-slate-400 line-through dark:text-slate-500"
+                      : "text-slate-600 dark:text-slate-400"
+                  }`}
+                >
+                  {task.description}
+                </p>
+              )}
+<div className="mt-4 flex flex-wrap items-center gap-3">
+              <span
+                className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset ${
+                  priorityStyles[task.priority] ||
+                  priorityStyles.Medium ||
+                  "bg-slate-100 text-slate-700 ring-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700"
+                }`}
+              >
+                {task.priority || "Medium"}
+              </span>
+
+              <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                <CalendarDays size={15} />
+                <span>
+                  {formatDate ? formatDate(task.taskDate) : task.taskDate}
+                </span>
+              </div>
+</div>
         </div>
       </div>
     </article>
@@ -186,7 +191,7 @@ function DailyTaskList({
   }
 
   return (
-    <div className="divide-y divide-slate-100 dark:divide-slate-800">
+    <div className="space-y-4">
       {tasks.map((task) => (
         <TaskItem
           key={task._id}

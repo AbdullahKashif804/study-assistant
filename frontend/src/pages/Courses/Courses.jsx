@@ -1,3 +1,6 @@
+import ModuleLayout, { ModuleColumns, ModuleRecords } from "../../components/ui/ModuleLayout";
+import Pagination from "../../components/ui/Pagination";
+import useFormDraft from "../../hooks/useFormDraft";
 import {
   BookOpen,
   CheckCircle2,
@@ -6,8 +9,6 @@ import {
 } from "lucide-react";
 
 import { useState, useEffect, useMemo, useRef } from "react";
-import DashboardHeader from "../../components/dashboard/DashboardHeader";
-import DashboardSidebar from "../../components/dashboard/DashboardSidebar";
 import CourseToolbar from "../../components/courses/CourseToolbar";
 import CourseForm from "../../components/courses/CourseForm";
 import CourseList from "../../components/courses/CourseList";
@@ -24,9 +25,23 @@ const emptyForm = {
   status: "Active",
 };
 
+async function fetchCurrentSemester(token) {
+  const response = await fetch("http://localhost:5000/api/user/profile", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Unable to fetch current semester");
+  }
+
+  return data.data.currentSemester;
+}
+
 function Courses(){
   const [courses, setCourses] = useState([]);
   const [form, setForm] = useState(emptyForm);
+  const [currentSemester, setCurrentSemester] = useState("");
   const [editId, setEditId] = useState(null);
   const [attachment, setAttachment] = useState(null);
 
@@ -47,14 +62,29 @@ function Courses(){
   const [deletingId, setDeletingId] = useState(null);
 
   const [error, setError] = useState("");
-
   const [successMessage, setSuccessMessage] = useState("");
-
   const formSectionRef = useRef(null);
-
   const titleInputRef = useRef(null);
-
+  const confirmDiscard = useFormDraft(form, attachment, { ...emptyForm, semester: currentSemester });
   const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetchCurrentSemester(token)
+      .then((semester) => {
+        if (cancelled) return;
+        setCurrentSemester(semester);
+        setForm((previousForm) => previousForm.semester
+          ? previousForm
+          : { ...previousForm, semester });
+      })
+      .catch((error) => {
+        if (!cancelled) setError(error.message);
+      });
+
+    return () => { cancelled = true; };
+  }, [token]);
 
   async function fetchCourses() {
     try {
@@ -98,7 +128,7 @@ function Courses(){
       ...previousForm,
       [name]: value,
     }));
-    
+
 
     setError("");
     setSuccessMessage("");
@@ -112,16 +142,25 @@ function Courses(){
     setIsFormOpen(true);
 
     setTimeout(() => {
-      formSectionRef.current?.scrollIntoView({
+      if (window.matchMedia("(min-width: 1024px)").matches) { formSectionRef.current?.scrollIntoView({
         behavior: "smooth",
         block: "center",
-      });
+      }); }
 
       titleInputRef.current?.focus();
     }, 0);
   }
-  function handleNewCourse() {
-    setForm(emptyForm);
+  async function handleNewCourse() {
+    if (submitting || !confirmDiscard()) return;
+    let semester;
+    try {
+      semester = await fetchCurrentSemester(token);
+    } catch (error) {
+      setError(error.message);
+      return;
+    }
+    setCurrentSemester(semester);
+    setForm({ ...emptyForm, semester });
     setAttachment(null);
     setEditId(null);
     setOpenMenuId(null);
@@ -131,6 +170,7 @@ function Courses(){
   }
 
   function handleEdit(course) {
+    if (submitting || !confirmDiscard()) return;
     setEditId(course._id);
 
     setForm({
@@ -148,7 +188,7 @@ function Courses(){
     openCourseForm();
   }
   function resetForm() {
-    setForm(emptyForm);
+    setForm({ ...emptyForm, semester: currentSemester });
     setAttachment(null);
     setEditId(null);
     setOpenMenuId(null);
@@ -310,16 +350,11 @@ function Courses(){
 
 
 
-  return(
-    <div className="min-h-screen bg-slate-100 dark:bg-slate-950 lg:flex">
-      <DashboardSidebar
-      isSidebarOpen={isSidebarOpen}
-      setIsSidebarOpen={setIsSidebarOpen}
-      />
-      <div className="min-w-0 flex-1">
-        <DashboardHeader setIsSidebarOpen={setIsSidebarOpen} /> 
-          <main className="mx-auto max-w-7xl px-4 mt-20 py-6 sm:px-6 lg:pl-68">
+  return (
+    <ModuleLayout isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen}>
             <CourseToolbar
+
+            busy={submitting}
             search={search}
             setSearch={setSearch}
             semesterFilter={semesterFilter}
@@ -331,17 +366,17 @@ function Courses(){
             handleNewCourse={handleNewCourse}
             />
                 {error && (
-                    <div className="mb-5 rounded-xl border border-red-200 bg-red-50 dark:border-red-900/50 dark:bg-red-950/50 px-4 py-3 text-sm font-medium text-red-700 dark:text-red-400">
+                    <div className="mt-5 rounded-xl border border-red-200 bg-red-50 dark:border-red-900/50 dark:bg-red-950/50 px-4 py-3 text-sm font-medium text-red-700 dark:text-red-400">
                         {error}
                     </div>
                 )}
                 {successMessage && (
-                    <div className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 dark:border-emerald-900/50 dark:bg-emerald-950/50 px-4 py-3 text-sm font-medium text-emerald-700 dark:text-emerald-400">
+                    <div className="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 dark:border-emerald-900/50 dark:bg-emerald-950/50 px-4 py-3 text-sm font-medium text-emerald-700 dark:text-emerald-400">
                         {successMessage}
                     </div>
                 )}
                 <div className="mt-6">
-                <section className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                <section className="mb-6 grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
                     <StatCard
                     title="Total Courses"
                     value={courseStats.total}
@@ -372,8 +407,8 @@ function Courses(){
                     />
                 </section>
                 </div>
-                <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_400px]">
-                    <section className="overflow-visible rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                <ModuleColumns>
+                    <ModuleRecords title="Courses" pagination={!fetching && <Pagination totalItems={courses.length} itemLabel="course" />}>
                         <CourseList
                         courses={courses}
                         fetching={fetching}
@@ -383,15 +418,10 @@ function Courses(){
                         handleEdit={handleEdit}
                         handleDelete={handleDelete}
                         />
-                        {!fetching && (
-                          <div className="mt-6 flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-900 sm:flex-row sm:items-center sm:justify-between">
-                            <p className="text-sm text-slate-500 dark:text-slate-400">
-                              Showing page 1 of 1 • {courses.length} total {courses.length === 1 ? "course" : "courses"}
-                            </p>
-                          </div>
-                        )}
-            </section>
+            </ModuleRecords>
             <CourseForm
+              error={error}
+              confirmDiscard={confirmDiscard}
             form={form}
             handleChange={handleChange}
             handleSubmit={handleSubmit}
@@ -399,17 +429,15 @@ function Courses(){
             handleAttachmentChange={handleAttachmentChange}
             editId={editId}
             submitting={submitting}
-            resetForm={resetForm}
+            handleCancel={handleCancel}
             isFormOpen={isFormOpen}
             formSectionRef={formSectionRef}
             titleInputRef={titleInputRef}
             setIsFormOpen={setIsFormOpen}
-            /> 
-                </div>
-            </main>
-        </div>
-    </div>
-  )
+            />
+                </ModuleColumns>
+                </ModuleLayout>
+  );
 }
 
 export default Courses;
