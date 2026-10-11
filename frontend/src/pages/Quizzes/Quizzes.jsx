@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import ModuleLayout, { ModuleColumns, ModuleRecords } from "../../components/ui/ModuleLayout";
 import Pagination from "../../components/ui/Pagination";
 import useFormDraft from "../../hooks/useFormDraft";
@@ -13,7 +14,7 @@ import QuizList from "../../components/quizzes/QuizList";
 import QuizToolbar from "../../components/quizzes/QuizToolbar";
 import StatCard from "../../components/quizzes/QuizStats";
 
-const API_URL = "http://localhost:5000/api/quiz";
+const API_URL = `${API_BASE_URL}/api/quiz`;
 
 const emptyForm = {
   title: "",
@@ -96,7 +97,7 @@ function Quizzes() {
 
   async function fetchCourses() {
     try {
-      const response = await fetch("http://localhost:5000/api/course/get", {
+      const response = await fetch(`${API_BASE_URL}/api/course/get`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,

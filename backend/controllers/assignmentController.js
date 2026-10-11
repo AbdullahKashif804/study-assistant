@@ -1,3 +1,4 @@
+const { saveWithFileReplacement } = require("../utils/saveWithFileReplacement");
 const assignmentModel = require('../models/Assignments')
 const courseModel = require('../models/Courses')
 const { uploadToCloudinary } = require('../utils/cloudinaryUpload');
@@ -37,6 +38,7 @@ const addAssignment = async(req,res)=>{
             if(cloudResult){
                 attachmentData = {
                     url:cloudResult.secure_url,
+              deliveryType: cloudResult.type || "authenticated",
                     publicId:cloudResult.public_id,
                     originalName: req.file.originalname,
                     format:cloudResult.format || req.file.originalname.split('.').pop(),
@@ -213,28 +215,12 @@ const updateAssignment =  async (req,res) => {
         assignment.totalMark = totalMark;
         assignment.obtainedMark = obtainedMark !== undefined && obtainedMark !== "" ? obtainedMark : null;
 
-        if (req.file) {
-            if (assignment.attachment && assignment.attachment.publicId) {
-                await deleteFromCloudinary(
-                    assignment.attachment.publicId,
-                    assignment.attachment.resourceType
-                );
-            }
-
-            const cloudResult = await uploadToCloudinary(req.file.path, 'assignment_attachments');
-            if (cloudResult) {
-                assignment.attachment = {
-                    url: cloudResult.secure_url,
-                    publicId: cloudResult.public_id,
-                    originalName: req.file.originalname,
-                    format: cloudResult.format || req.file.originalname.split('.').pop(),
-                    resourceType: cloudResult.resource_type,
-                    size: cloudResult.bytes || req.file.size
-                };
-            }
-        }
-
-        await assignment.save();
+        await saveWithFileReplacement({
+          document: assignment,
+          field: "attachment",
+          file: req.file,
+          folder: "assignment_attachments",
+        });
         await assignment.populate('course');
     return res.status(200).json({
         success:true,
@@ -264,7 +250,8 @@ const deleteAssignment = async (req,res) => {
         if (assignment.attachment && assignment.attachment.publicId) {
                     await deleteFromCloudinary(
                         assignment.attachment.publicId,
-                        assignment.attachment.resourceType
+                        assignment.attachment.resourceType,
+          { deliveryType: assignment.attachment.deliveryType || "upload" }
                     );
                 }
                 await assignmentModel.deleteOne({ _id: assignment._id });

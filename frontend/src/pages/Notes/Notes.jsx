@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import useFormDraft from "../../hooks/useFormDraft";
 import ModuleLayout, { ModuleColumns, ModuleRecords } from "../../components/ui/ModuleLayout";
 import { useState, useEffect, useRef } from "react";
@@ -7,7 +8,7 @@ import NotesList from "../../components/notes/NotesList";
 import NotePagination from "../../components/notes/NotePagination";
 import NotesAI from "../../components/notes/NotesAI";
 
-const API_URL = "http://localhost:5000/api/note";
+const API_URL = `${API_BASE_URL}/api/note`;
 
 const emptyForm = {
     title: "",
@@ -92,7 +93,7 @@ function Notes() {
 
     async function fetchCourses() {
         try {
-            const response = await fetch("http://localhost:5000/api/course/get", {
+            const response = await fetch(`${API_BASE_URL}/api/course/get`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

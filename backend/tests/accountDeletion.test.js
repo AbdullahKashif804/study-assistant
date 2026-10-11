@@ -29,6 +29,7 @@ function fixture() {
     ]])),
   };
   const calls = [];
+  const deliveryCalls = [];
   const deleted = new Set();
   let transactions = 0;
   const options = {};
@@ -63,7 +64,8 @@ function fixture() {
       assert.ok(opts.session);
       state.pending = state.pending.filter(record => record.email !== filter.email);
     } },
-    "../utils/cloudinaryDelete": { async deleteFromCloudinary(id, type) {
+    "../utils/cloudinaryDelete": { async deleteFromCloudinary(id, type, settings) {
+      deliveryCalls.push(settings.deliveryType);
       calls.push([id, type]);
       if (options.cloudThrow) throw new Error("Network failure");
       if (options.cloudFailure) return { result: "error" };
@@ -83,7 +85,7 @@ function fixture() {
       state.records[name] = state.records[name].filter(record => record.user !== filter.user);
     },
   };
-  return { state, calls, options, api: load("services/accountDeletionService.js", dependencies) };
+  return { state, calls, deliveryCalls, options, api: load("services/accountDeletionService.js", dependencies) };
 }
 
 test("complete cascade preserves other users and uses stored Cloudinary types", async () => {
@@ -191,3 +193,5 @@ test("JWT middleware denies deleted and pending users, allowing only authenticat
   assert.equal(deleted.code, 401);
   assert.equal(passed, 1);
 });
+
+test("account deletion distinguishes authenticated study resources from public profile and legacy assets", async () => { const f = fixture(); f.state.records.Notes[0].attachment.deliveryType = "authenticated"; await f.api.deleteAccount("owner"); assert.deepEqual(f.deliveryCalls, ["upload", "authenticated", "upload", "upload", "upload"]); });

@@ -19,9 +19,12 @@ const connectDB=require("./config/db")
 const app=express()
 const PORT=process.env.PORT || 5000;
 
+// Render's nearest ingress hop only; direct local requests ignore forwarded headers.
+// Re-verify the proxy chain before adding a CDN/proxy or another ingress path.
+app.set('trust proxy', process.env.RENDER === 'true' ? 1 : false)
+
 app.use(cors())
 app.use(express.json())
-connectDB()
 
 app.get("/",(req,res)=>{
     res.send("Running")
@@ -40,6 +43,16 @@ app.use('/api/dashboard',Dashboard)
 app.use('/api/admin', adminRoutes);
 app.use("/api/search", globalSearchRoutes);
 app.use("/api/ai", aiRoutes);
-app.listen(PORT,()=>{
-    console.log(`Server is running on ${PORT}`)
-})
+async function startServer() {
+    try {
+        await connectDB()
+        app.listen(PORT,()=>{
+            console.log(`Server is running on ${PORT}`)
+        })
+    } catch {
+        console.error("Startup failed: unable to initialize the backend. Check MongoDB configuration and connectivity. HTTP server was not started.")
+        process.exit(1)
+    }
+}
+
+startServer()

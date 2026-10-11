@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import ModuleLayout, { ModuleColumns, ModuleRecords } from "../../components/ui/ModuleLayout";
 import useFormDraft from "../../hooks/useFormDraft";
 import {
@@ -14,7 +15,7 @@ import ToDoTaskToolbar from "../../components/todoTasks/ToDoTaskToolbar";
 import StatCard from "../../components/todoTasks/ToDoTaskStats";
 import ToDoTaskPagination from "../../components/todoTasks/ToDoTaskPagination";
 
-const API_URL = "http://localhost:5000/api/todoTask";
+const API_URL = `${API_BASE_URL}/api/todoTask`;
 
 const emptyForm = {
   title: "",

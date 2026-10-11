@@ -1,3 +1,4 @@
+const { limitAI } = require("../middleware/aiWorkload");
 const express = require("express");
 
 const router = express.Router();
@@ -13,18 +14,18 @@ const authMiddleware = require(
 router.post(
   "/note/:id/generate",
   authMiddleware,
-  aiController.generateFromNote
+  limitAI(aiController.generateFromNote)
 );
 
 router.post(
   "/notes/ask",
   authMiddleware,
-  aiController.askNotes
+  limitAI(aiController.askNotes)
 );
 router.post(
   "/study-agent",
   authMiddleware,
-  aiController.askStudyAgent
+  limitAI(aiController.askStudyAgent)
 );
 
 module.exports = router;

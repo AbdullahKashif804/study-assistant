@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import { useState } from "react";
 import {
   ArrowLeft,
@@ -59,7 +60,7 @@ const handleChangePassword = async (event) => {
         const token = localStorage.getItem("token");
 
         const response = await fetch(
-            "http://localhost:5000/api/user/change-password",
+            `${API_BASE_URL}/api/user/change-password`,
             {
                 method: "PUT",
                 headers: {
@@ -113,7 +114,7 @@ const handleDeleteAccount = async (event) => {
         const token = localStorage.getItem("token");
 
         const response = await fetch(
-            "http://localhost:5000/api/user/delete-account",
+            `${API_BASE_URL}/api/user/delete-account`,
             {
                 method: "DELETE",
                 headers: {

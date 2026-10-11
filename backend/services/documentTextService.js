@@ -1,3 +1,8 @@
+const { attachmentURL } = require("./attachmentDelivery");
+const { Worker } = require("node:worker_threads");
+const path = require("node:path");
+const limits = require("../config/aiLimits");
+const { AIError, fetchLimited } = require("../utils/aiSafety");
 const SUPPORTED_DOCUMENT_FORMATS = [
   "pdf",
   "docx",
@@ -24,20 +29,34 @@ function normalizeFormat(format, originalName = "") {
 }
 
 async function downloadFileBuffer(url) {
-  const response = await fetch(url);
+  return fetchLimited(url, { redirect: "error" }, { timeoutMs: limits.DOWNLOAD_TIMEOUT_MS, maxBytes: limits.MAX_DOCUMENT_BYTES });
+}
 
-  if (!response.ok) {
-    throw new Error(
-      "Failed to download the attached study file"
-    );
-  }
-
-  const arrayBuffer = await response.arrayBuffer();
-
-  return Buffer.from(arrayBuffer);
+function parseDocument(buffer, format) {
+  return new Promise((resolve, reject) => {
+    const worker = new Worker(path.join(__dirname, "documentParserWorker.js"), {
+      workerData: { buffer, format }, resourceLimits: { maxOldGenerationSizeMb: 128 },
+    });
+    let finished = false;
+    const finish = (error, text) => {
+      if (finished) return;
+      finished = true; clearTimeout(timer);
+      void worker.terminate().catch(() => {});
+      if (error) reject(error); else resolve(text);
+    };
+    const timer = setTimeout(() => finish(new AIError(504, "Document processing timed out. Please use a smaller document.")), limits.PARSE_TIMEOUT_MS);
+    worker.once("message", result => {
+      if (result.oversized) finish(new AIError(413, "Document text exceeds the AI processing limit"));
+      else if (result.failed || typeof result.text !== "string") finish(new AIError(422, "Study document could not be processed"));
+      else finish(null, result.text);
+    });
+    worker.once("error", () => finish(new AIError(422, "Study document could not be processed within resource limits")));
+    worker.once("exit", () => { if (!finished) finish(new AIError(422, "Study document processing stopped")); });
+  });
 }
 
 async function extractDocumentText({
+  attachment,
   url,
   format,
   originalName,
@@ -59,22 +78,9 @@ async function extractDocumentText({
     };
   }
 
-  const fileBuffer = await downloadFileBuffer(url);
+  const fileBuffer = await downloadFileBuffer(attachment ? attachmentURL(attachment) : url);
 
-  const officeParser = require("officeparser");
-
-  const ast = await officeParser.parseOffice(
-    fileBuffer,
-    {
-      fileType: normalizedFormat,
-    }
-  );
-
-  const textResult = await ast.to("text");
-
-  const text = String(
-    textResult?.value || ""
-  ).trim();
+  const text = await parseDocument(fileBuffer, normalizedFormat);
 
   return {
     supported: true,

@@ -1,3 +1,4 @@
+const { AIError, requireText } = require("../utils/aiSafety");
 const assignmentModel = require("../models/Assignments");
 const projectModel = require("../models/Projects");
 const quizModel = require("../models/Quizzes");
@@ -7,6 +8,8 @@ const todoTaskModel = require("../models/todoTask");
 const {
   retrieveRelevantNoteChunks,
 } = require("./ragService");
+
+function boundedText(value, max = 1000) { return typeof value === "string" ? value.slice(0, max) : ""; }
 
 function normalizeLimit(value, fallback = 20) {
   const number = Number(value);
@@ -40,16 +43,16 @@ async function getAssignments(userId, args = {}) {
       createdAt: -1,
     })
     .limit(limit)
-    .lean();
+    .maxTimeMS(5000).lean();
 
   return assignments.map((item) => ({
     id: item._id,
-    title: item.title,
-    description: item.description,
+    title: boundedText(item.title, 500),
+    description: boundedText(item.description),
     course: item.course
       ? {
-          title: item.course.title,
-          courseCode: item.course.courseCode,
+          title: boundedText(item.course.title, 500),
+          courseCode: boundedText(item.course.courseCode, 100),
         }
       : null,
     dueDate: item.dueDate,
@@ -78,19 +81,19 @@ async function getProjects(userId, args = {}) {
       createdAt: -1,
     })
     .limit(limit)
-    .lean();
+    .maxTimeMS(5000).lean();
 
   return projects.map((item) => ({
     id: item._id,
-    title: item.title,
-    description: item.description || "",
+    title: boundedText(item.title, 500),
+    description: boundedText(item.description),
     course: item.course
       ? {
-          title: item.course.title,
-          courseCode: item.course.courseCode,
+          title: boundedText(item.course.title, 500),
+          courseCode: boundedText(item.course.courseCode, 100),
         }
       : null,
-    technologies: item.technologies || [],
+    technologies: (item.technologies || []).slice(0, 20).map(value => boundedText(value, 100)),
     dueDate: item.dueDate,
     status: item.status,
     totalMark: item.totalMark,
@@ -117,15 +120,15 @@ async function getQuizzes(userId, args = {}) {
       createdAt: -1,
     })
     .limit(limit)
-    .lean();
+    .maxTimeMS(5000).lean();
 
   return quizzes.map((item) => ({
     id: item._id,
-    title: item.title,
+    title: boundedText(item.title, 500),
     course: item.course
       ? {
-          title: item.course.title,
-          courseCode: item.course.courseCode,
+          title: boundedText(item.course.title, 500),
+          courseCode: boundedText(item.course.courseCode, 100),
         }
       : null,
     dueDate: item.dueDate,
@@ -157,12 +160,12 @@ async function getDailyTasks(userId, args = {}) {
       createdAt: -1,
     })
     .limit(limit)
-    .lean();
+    .maxTimeMS(5000).lean();
 
   return tasks.map((item) => ({
     id: item._id,
-    title: item.title,
-    description: item.description || "",
+    title: boundedText(item.title, 500),
+    description: boundedText(item.description),
     taskDate: item.taskDate,
     priority: item.priority,
     status: item.status,
@@ -191,12 +194,12 @@ async function getTodoTasks(userId, args = {}) {
       createdAt: -1,
     })
     .limit(limit)
-    .lean();
+    .maxTimeMS(5000).lean();
 
   return tasks.map((item) => ({
     id: item._id,
-    title: item.title,
-    description: item.description || "",
+    title: boundedText(item.title, 500),
+    description: boundedText(item.description),
     dueDate: item.dueDate,
     priority: item.priority,
     status: item.status,
@@ -204,9 +207,7 @@ async function getTodoTasks(userId, args = {}) {
 }
 
 async function searchStudyMaterial(userId, args = {}) {
-  const question = String(
-    args.question || ""
-  ).trim();
+  const question = requireText(args.question, 1000, "Question");
 
   if (!question) {
     return [];
@@ -233,6 +234,10 @@ async function executeStudyAgentTool({
   userId,
   arguments: args = {},
 }) {
+  if (!args || typeof args !== "object" || Array.isArray(args)) throw new AIError(400, "Invalid study planner tool input");
+  for (const field of ["status", "priority"]) {
+    if (args[field] !== undefined && (typeof args[field] !== "string" || args[field].length > 30)) throw new AIError(400, "Invalid study planner filter");
+  }
   switch (toolName) {
     case "get_assignments":
       return getAssignments(userId, args);

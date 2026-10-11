@@ -1,4 +1,6 @@
+const { saveWithFileReplacement } = require("../utils/saveWithFileReplacement");
 const bcrypt = require("bcrypt");
+const { BCRYPT_COST } = require("../config/password");
 const userModel = require("../models/Users.js");
 
 const { deleteAccount } = require("../services/accountDeletionService");
@@ -59,7 +61,7 @@ const SignUp = async (req, res) => {
       });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 6);
+    const hashedPassword = await bcrypt.hash(password, BCRYPT_COST);
 
     const verificationCode = generateVerificationCode();
 
@@ -375,32 +377,12 @@ const updateProfile = async (req, res) => {
       user.bio = bio;
     }
 
-    if (req.file) {
-      if (user.profileImage && user.profileImage.publicId) {
-        await deleteFromCloudinary(
-          user.profileImage.publicId,
-          user.profileImage.resourceType || "image"
-        );
-      }
-
-      const cloudinaryResult = await uploadToCloudinary(
-        req.file.path,
-        "profile_images"
-      );
-
-      user.profileImage = {
-        url: cloudinaryResult.secure_url,
-        publicId: cloudinaryResult.public_id,
-        format:
-          cloudinaryResult.format ||
-          path.extname(req.file.originalname).replace(".", ""),
-        resourceType:
-          cloudinaryResult.resource_type || "image",
-        size: cloudinaryResult.bytes || req.file.size,
-      };
-    }
-
-    await user.save();
+    await saveWithFileReplacement({
+      document: user,
+      field: "profileImage",
+      file: req.file,
+      folder: "profile_images",
+    });
 
     return res.status(200).json({
       success: true,
@@ -522,7 +504,7 @@ const changePassword = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(
       newPassword,
-      6
+      BCRYPT_COST
     );
 
     user.password = hashedPassword;

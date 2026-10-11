@@ -1,3 +1,5 @@
+const limits = require("../config/aiLimits");
+const { AIError, requireText, checkDeadline, requestAI } = require("../utils/aiSafety");
 const {
   executeStudyAgentTool,
 } = require("./studyAgentTools");
@@ -238,8 +240,8 @@ const STUDY_AGENT_TOOLS = [
 async function callAgent(messages) {
   if (!process.env.GROQ_API_KEY) {
     const error =
-      new Error(
-        "GROQ_API_KEY is not configured"
+      new AIError(502,
+        "AI service is currently unavailable"
       );
 
     error.statusCode = 503;
@@ -247,7 +249,7 @@ async function callAgent(messages) {
     throw error;
   }
 
-  const response = await fetch(
+  const data = await requestAI(
     GROQ_API_URL,
     {
       method: "POST",
@@ -262,6 +264,7 @@ async function callAgent(messages) {
 
       body: JSON.stringify({
         model: GROQ_MODEL,
+        max_completion_tokens: limits.MAX_COMPLETION_TOKENS,
 
         messages,
 
@@ -281,28 +284,13 @@ async function callAgent(messages) {
     }
   );
 
-  const data =
-    await response.json();
-
-  if (!response.ok) {
-    const error =
-      new Error(
-        data?.error?.message ||
-          "Study agent is currently unavailable"
-      );
-
-    error.statusCode = 502;
-
-    throw error;
-  }
-
   const message =
     data?.choices?.[0]
       ?.message;
 
   if (!message) {
     const error =
-      new Error(
+      new AIError(502,
         "Study agent returned an empty response"
       );
 
@@ -320,9 +308,10 @@ function safeParseArguments(rawArguments) {
       return {};
     }
 
-    return JSON.parse(
-      rawArguments
-    );
+    if (typeof rawArguments !== "string" || rawArguments.length > 4000) throw new AIError(502, );
+    const args = JSON.parse(rawArguments);
+    if (!args || typeof args !== "object" || Array.isArray(args)) throw new AIError(502, );
+    return args;
   } catch {
     return {};
   }
@@ -332,6 +321,9 @@ async function runStudyAgent({
   userId,
   question,
 }) {
+  requireText(question, 1500, "Question");
+  const deadline = Date.now() + limits.WORK_TIMEOUT_MS;
+  let toolCount = 0;
   const messages = [
     {
       role: "system",
@@ -371,8 +363,10 @@ Important rules:
     step < MAX_AGENT_STEPS;
     step += 1
   ) {
+    checkDeadline(deadline);
     const assistantMessage =
       await callAgent(messages);
+    checkDeadline(deadline);
 
     messages.push({
       role: "assistant",
@@ -390,6 +384,8 @@ Important rules:
       assistantMessage.tool_calls ||
       [];
 
+    if (!Array.isArray(toolCalls) || toolCount + toolCalls.length > limits.MAX_TOOL_CALLS) throw new AIError(413, "Study planner tool workload exceeds the limit");
+    toolCount += toolCalls.length;
     if (
       toolCalls.length === 0
     ) {
@@ -405,6 +401,7 @@ Important rules:
     for (
       const toolCall of toolCalls
     ) {
+      checkDeadline(deadline);
       const toolName =
         toolCall?.function?.name;
 
@@ -423,6 +420,8 @@ Important rules:
           arguments: args,
         });
 
+      checkDeadline(deadline);
+      if (JSON.stringify(toolResult).length > limits.MAX_TOOL_RESULT_CHARS) throw new AIError(413, "Study planner results exceed the context limit. Request fewer records.");
       toolsUsed.push(
         toolName
       );
@@ -442,7 +441,7 @@ Important rules:
   }
 
   const error =
-    new Error(
+    new AIError(502,
       "Study agent exceeded the maximum number of reasoning steps"
     );
 

@@ -1,6 +1,8 @@
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const { randomUUID } = require('node:crypto');
+const { trackTempUpload, withTempUploadCleanup } = require('../utils/tempUploadCleanup');
 
 const uploadDir = path.join(__dirname, '../uploads');
 if (!fs.existsSync(uploadDir)) {
@@ -13,9 +15,10 @@ const storage = multer.diskStorage({
     cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     const ext = path.extname(file.originalname);
-    cb(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
+    const filename = `attachment-${randomUUID()}${ext}`;
+    trackTempUpload(req, filename);
+    cb(null, filename);
   }
 });
 
@@ -45,6 +48,6 @@ const upload = multer({
   }
 });
 
-const uploadMiddleware = upload.single('attachment');
+const uploadMiddleware = withTempUploadCleanup(upload.single('attachment'));
 
 module.exports = uploadMiddleware

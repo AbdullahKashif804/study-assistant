@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import { useState } from "react";
 
 import {
@@ -9,7 +10,7 @@ import {
 } from "lucide-react";
 
 const AI_API_URL =
-  "http://localhost:5000/api/ai";
+  `${API_BASE_URL}/api/ai`;
 
 function NotesAI() {
   const [

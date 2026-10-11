@@ -1,3 +1,4 @@
+const { saveWithFileReplacement } = require("../utils/saveWithFileReplacement");
 const noteModel =
   require("../models/Notes.js");
 
@@ -75,6 +76,7 @@ const addNote =
           attachmentData = {
             url:
               cloudResult.secure_url,
+              deliveryType: cloudResult.type || "authenticated",
 
             publicId:
               cloudResult.public_id,
@@ -429,79 +431,17 @@ const updateNote =
           null;
       }
 
-      if (req.file) {
-        if (
-          note.attachment &&
-          note.attachment
-            .publicId
-        ) {
-          await deleteFromCloudinary(
-            note.attachment
-              .publicId,
-
-            note.attachment
-              .resourceType
-          );
-        }
-
-        const cloudResult =
-          await uploadToCloudinary(
-            req.file.path,
-            "notes_attachments"
-          );
-
-        if (cloudResult) {
-          const attachmentData =
-            {
-              url:
-                cloudResult
-                  .secure_url,
-
-              publicId:
-                cloudResult
-                  .public_id,
-
-              originalName:
-                req.file
-                  .originalname,
-
-              format:
-                cloudResult
-                  .format ||
-                req.file
-                  .originalname
-                  .split(".")
-                  .pop(),
-
-              resourceType:
-                cloudResult
-                  .resource_type,
-
-              size:
-                cloudResult
-                  .bytes ||
-                req.file.size,
-            };
-
-          note.attachment =
-            attachmentData;
-
-          // Phase 3:
-          // file changed, therefore
-          // old extracted text /
-          // embeddings are stale.
-          note.attachmentRagChunks =
-            [];
-
-          note.attachmentRagIndexedAt =
-            null;
-
-          note.attachmentRagPublicId =
-            null;
-        }
-      }
-
-      await note.save();
+      await saveWithFileReplacement({
+        document: note,
+        field: "attachment",
+        file: req.file,
+        folder: "notes_attachments",
+        onReplacement: () => {
+          note.attachmentRagChunks = [];
+          note.attachmentRagIndexedAt = null;
+          note.attachmentRagPublicId = null;
+        },
+      });
 
       await note.populate(
         "course"
@@ -562,7 +502,8 @@ const deleteNote =
             .publicId,
 
           note.attachment
-            .resourceType
+            .resourceType,
+          { deliveryType: note.attachment.deliveryType || "upload" }
         );
       }
 

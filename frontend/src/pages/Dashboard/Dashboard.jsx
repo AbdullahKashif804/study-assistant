@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import { useState, useEffect } from "react";
 import { LoaderCircle } from "lucide-react";
 
@@ -38,7 +39,7 @@ function Dashboard() {
             const token = localStorage.getItem("token");
 
             const response = await fetch(
-                "http://localhost:5000/api/dashboard/get",
+                `${API_BASE_URL}/api/dashboard/get`,
                 {
                     method: "GET",
                     headers: {
@@ -82,7 +83,7 @@ function Dashboard() {
             const token = localStorage.getItem("token");
 
             const response = await fetch(
-                "http://localhost:5000/api/dashboard/deadline-reminders",
+                `${API_BASE_URL}/api/dashboard/deadline-reminders`,
                 {
                     method: "GET",
                     headers: {

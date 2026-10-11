@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import {
   CheckCircle2,
   Eye,
@@ -84,7 +85,7 @@ if (!formElement.checkValidity()) {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/user/signup",
+        `${API_BASE_URL}/api/user/signup`,
         {
           method: "POST",
 

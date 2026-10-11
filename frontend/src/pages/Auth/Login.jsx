@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import Header from "../../components/layout/Header";
 import { useState } from "react";
 import { Link, useNavigate } from 'react-router-dom';
@@ -17,7 +18,7 @@ function Login() {
         setLoading(true);
         setError('');
         try {
-            const response = await fetch('http://localhost:5000/api/user/signin', {
+            const response = await fetch(`${API_BASE_URL}/api/user/signin`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

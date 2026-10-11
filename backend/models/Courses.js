@@ -1,6 +1,7 @@
 const mongoose = require ('mongoose')
 
 const attachmentSchema = new mongoose.Schema({
+    deliveryType: { type: String, enum: ["upload", "authenticated"], default: "upload" },
   url: {
     type: String,
     required: true,

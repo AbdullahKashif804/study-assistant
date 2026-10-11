@@ -1,3 +1,4 @@
+const { saveWithFileReplacement } = require("../utils/saveWithFileReplacement");
 const projectModel = require('../models/Projects')
 const courseModel = require('../models/Courses')
 const { uploadToCloudinary } = require('../utils/cloudinaryUpload');
@@ -46,6 +47,7 @@ const addProject = async (req,res)=>{
                         if(cloudResult){
                             attachmentData = {
                                 url:cloudResult.secure_url,
+              deliveryType: cloudResult.type || "authenticated",
                                 publicId:cloudResult.public_id,
                                 originalName: req.file.originalname,
                                 format:cloudResult.format || req.file.originalname.split('.').pop(),
@@ -220,27 +222,12 @@ const updateProject =async (req,res)=>{
         project.totalMark = totalMark;
         project.obtainedMark = obtainedMark !== undefined && obtainedMark !== "" ? obtainedMark : null;
 
-        if (req.file) {
-                    if (project.attachment && project.attachment.publicId) {
-                        await deleteFromCloudinary(
-                            project.attachment.publicId,
-                            project.attachment.resourceType
-                        );
-                    }
-        
-                    const cloudResult = await uploadToCloudinary(req.file.path, 'project_attachments');
-                    if (cloudResult) {
-                        project.attachment = {
-                            url: cloudResult.secure_url,
-                            publicId: cloudResult.public_id,
-                            originalName: req.file.originalname,
-                            format: cloudResult.format || req.file.originalname.split('.').pop(),
-                            resourceType: cloudResult.resource_type,
-                            size: cloudResult.bytes || req.file.size
-                        };
-                    }
-                }
-                await project.save();
+        await saveWithFileReplacement({
+          document: project,
+          field: "attachment",
+          file: req.file,
+          folder: "project_attachments",
+        });
         await project.populate('course');
     return res.status(200).json({
         success:true,
@@ -269,7 +256,8 @@ const deleteProject =async (req,res)=>{
     if (project.attachment && project.attachment.publicId) {
                         await deleteFromCloudinary(
                             project.attachment.publicId,
-                            project.attachment.resourceType
+                            project.attachment.resourceType,
+          { deliveryType: project.attachment.deliveryType || "upload" }
                         );
                     }
                     await projectModel.deleteOne({ _id: project._id });

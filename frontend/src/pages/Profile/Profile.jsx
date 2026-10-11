@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import { useEffect, useState, useRef } from "react";
 
 import {
@@ -32,7 +33,6 @@ import DashboardSidebar from "../../components/dashboard/DashboardSidebar";
 
 import DashboardHeader from "../../components/dashboard/DashboardHeader";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
 function Profile() {
 

@@ -1,3 +1,4 @@
+import { openAttachment } from "../../utils/openAttachment";
 import { useEffect, useRef } from "react";
 import {
   BookOpen,
@@ -182,22 +183,20 @@ function CourseList({
                     </div>
                     <p className="truncate text-sm font-medium text-slate-700 dark:text-slate-300">
                       {course.attachment.originalName}
+                {(course.attachment.deliveryType || "upload") === "upload" && <span className="ml-1 text-xs text-amber-600 dark:text-amber-400">(legacy public)</span>}
                     </p>
                   </div>
 
-                  <button
+                  <div className="flex shrink-0 flex-wrap items-center gap-2">
+<button
                     type="button"
-                    onClick={() =>
-                      window.open(
-                        course.attachment.url,
-                        "_blank",
-                        "noopener,noreferrer"
-                      )
-                    }
+                    onClick={() => openAttachment("course", course)}
                     className="btn-primary shrink-0 rounded-lg px-3 py-2 text-xs font-semibold transition focus:outline-none focus:ring-2"
                   >
                     View
                   </button>
+                  <button type="button" onClick={() => openAttachment("course", course, true)} className="btn-primary shrink-0 rounded-lg px-3 py-2 text-xs font-semibold transition">Download</button>
+</div>
                 </div>
               )}
             </div>

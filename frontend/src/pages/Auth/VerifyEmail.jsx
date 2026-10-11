@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import { Mail, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -23,7 +24,7 @@ const signupEmail = location.state?.email || "";
 
   try {
     const response = await fetch(
-      "http://localhost:5000/api/user/verify-email",
+      `${API_BASE_URL}/api/user/verify-email`,
       {
         method: "POST",
         headers: {
@@ -68,7 +69,7 @@ const handleResend = async () => {
 
   try {
     const response = await fetch(
-      "http://localhost:5000/api/user/resend-verification",
+      `${API_BASE_URL}/api/user/resend-verification`,
       {
         method: "POST",
         headers: {

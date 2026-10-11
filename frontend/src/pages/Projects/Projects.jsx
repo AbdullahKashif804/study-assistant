@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import ModuleLayout, { ModuleColumns, ModuleRecords } from "../../components/ui/ModuleLayout";
 import Pagination from "../../components/ui/Pagination";
 import useFormDraft from "../../hooks/useFormDraft";
@@ -14,7 +15,7 @@ import ProjectList from "../../components/projects/ProjectList";
 import ProjectToolbar from "../../components/projects/ProjectToolbar";
 import StatCard from "../../components/projects/ProjectStats";
 
-const API_URL = "http://localhost:5000/api/project";
+const API_URL = `${API_BASE_URL}/api/project`;
 
 const emptyForm = {
   title: "",
@@ -101,7 +102,7 @@ function Projects() {
 
   async function fetchCourses() {
     try {
-      const response = await fetch("http://localhost:5000/api/course/get", {
+      const response = await fetch(`${API_BASE_URL}/api/course/get`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,

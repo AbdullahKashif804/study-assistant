@@ -1,3 +1,5 @@
+const limits = require("../config/aiLimits");
+const { AIError, requireText, requestAI } = require("../utils/aiSafety");
 const GROQ_API_URL =
   "https://api.groq.com/openai/v1/chat/completions";
 
@@ -10,8 +12,8 @@ async function callGroq({
 }) {
   if (!process.env.GROQ_API_KEY) {
     const error =
-      new Error(
-        "GROQ_API_KEY is not configured"
+      new AIError(502,
+        "AI service is currently unavailable"
       );
 
     error.statusCode = 503;
@@ -19,7 +21,7 @@ async function callGroq({
     throw error;
   }
 
-  const response = await fetch(
+  const data = await requestAI(
     GROQ_API_URL,
     {
       method: "POST",
@@ -34,6 +36,7 @@ async function callGroq({
 
       body: JSON.stringify({
         model: GROQ_MODEL,
+        max_completion_tokens: limits.MAX_COMPLETION_TOKENS,
         messages,
         temperature: 0.2,
         reasoning_effort: "low",
@@ -43,28 +46,13 @@ async function callGroq({
     }
   );
 
-  const data =
-    await response.json();
-
-  if (!response.ok) {
-    const error =
-      new Error(
-        data?.error?.message ||
-          "AI service is currently unavailable"
-      );
-
-    error.statusCode = 502;
-
-    throw error;
-  }
-
   const content =
     data?.choices?.[0]
       ?.message?.content;
 
   if (!content) {
     const error =
-      new Error(
+      new AIError(502,
         "AI service returned an empty response"
       );
 
@@ -77,7 +65,7 @@ async function callGroq({
     return JSON.parse(content);
   } catch {
     const error =
-      new Error(
+      new AIError(502,
         "AI service returned an invalid response"
       );
 
@@ -91,6 +79,8 @@ async function generateNoteSummary({
   title,
   content,
 }) {
+  requireText(title, limits.MAX_TITLE_CHARS, "Note title");
+  requireText(content, limits.MAX_NOTE_CHARS, "Note content");
   return callGroq({
     messages: [
       {
@@ -160,6 +150,8 @@ async function generateNoteQuiz({
   title,
   content,
 }) {
+  requireText(title, limits.MAX_TITLE_CHARS, "Note title");
+  requireText(content, limits.MAX_NOTE_CHARS, "Note content");
   return callGroq({
     messages: [
       {
@@ -260,6 +252,8 @@ async function answerFromNotes({
   question,
   retrievedChunks,
 }) {
+  requireText(question, 1000, "Question");
+  if (!Array.isArray(retrievedChunks) || retrievedChunks.length > 5) throw new AIError(413, "Too many retrieved sources");
   const context =
     retrievedChunks
       .map(

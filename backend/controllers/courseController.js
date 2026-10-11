@@ -1,3 +1,4 @@
+const { saveWithFileReplacement } = require("../utils/saveWithFileReplacement");
 const courseModel = require('../models/Courses')
 const { uploadToCloudinary } = require('../utils/cloudinaryUpload');
 const { deleteFromCloudinary } = require('../utils/cloudinaryDelete');
@@ -24,6 +25,7 @@ let attachmentData = null;
         if(cloudResult){
             attachmentData = {
                 url:cloudResult.secure_url,
+              deliveryType: cloudResult.type || "authenticated",
                 publicId:cloudResult.public_id,
                 originalName: req.file.originalname,
                 format:cloudResult.format || req.file.originalname.split('.').pop(),
@@ -158,27 +160,12 @@ const updateCourse = async (req,res)=>{
         course.description = description;
         course.status = status;
 
-        if (req.file) {
-            if (course.attachment && course.attachment.publicId) {
-                await deleteFromCloudinary(
-                    course.attachment.publicId,
-                    course.attachment.resourceType
-                );
-            }
-
-            const cloudResult = await uploadToCloudinary(req.file.path, 'course_attachments');
-            if (cloudResult) {
-                course.attachment = {
-                    url: cloudResult.secure_url,
-                    publicId: cloudResult.public_id,
-                    originalName: req.file.originalname,
-                    format: cloudResult.format || req.file.originalname.split('.').pop(),
-                    resourceType: cloudResult.resource_type,
-                    size: cloudResult.bytes || req.file.size
-                };
-            }
-        }
-        await course.save();
+        await saveWithFileReplacement({
+          document: course,
+          field: "attachment",
+          file: req.file,
+          folder: "course_attachments",
+        });
     
     return res.status(200).json({
         success:true,
@@ -207,7 +194,8 @@ const deleteCourse = async (req,res) => {
         if (course.attachment && course.attachment.publicId) {
                     await deleteFromCloudinary(
                         course.attachment.publicId,
-                        course.attachment.resourceType
+                        course.attachment.resourceType,
+          { deliveryType: course.attachment.deliveryType || "upload" }
                     );
                 }
                 await courseModel.deleteOne({ _id: course._id });

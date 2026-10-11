@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import ModuleLayout, { ModuleColumns, ModuleRecords } from "../../components/ui/ModuleLayout";
 import useFormDraft from "../../hooks/useFormDraft";
 import {
@@ -13,7 +14,7 @@ import DailyTaskForm from "../../components/dailyTasks/DailyTaskForm";
 import DailyTaskList from "../../components/dailyTasks/DailyTaskList";
 import DailyTaskPagination from "../../components/dailyTasks/DailyTaskPagination";
 
-const API_URL = "http://localhost:5000/api/dailyTask";
+const API_URL = `${API_BASE_URL}/api/dailyTask`;
 
 const emptyForm = {
   title: "",

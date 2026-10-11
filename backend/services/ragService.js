@@ -1,3 +1,5 @@
+const limits = require("../config/aiLimits");
+const { AIError, requireText, checkDeadline } = require("../utils/aiSafety");
 const noteModel = require("../models/Notes");
 
 const {
@@ -14,6 +16,7 @@ const CHUNK_OVERLAP = 200;
 const TOP_K = 5;
 
 function chunkText(text) {
+  if (String(text || "").length > limits.MAX_TEXT_CHARS) throw new AIError(413, "Study text exceeds the indexing limit");
   const cleanText = String(text || "")
     .replace(/\s+/g, " ")
     .trim();
@@ -42,6 +45,7 @@ function chunkText(text) {
 
     if (chunk) {
       chunks.push(chunk);
+      if (chunks.length > limits.MAX_CHUNKS_PER_SOURCE) throw new AIError(413, "Study source contains too many chunks");
     }
 
     if (end >= cleanText.length) {
@@ -98,7 +102,7 @@ function cosineSimilarity(vectorA, vectorB) {
   );
 }
 
-async function ensureNoteTextIndexed(note) {
+async function ensureNoteTextIndexed(note, budget) {
   const content = String(
     note.content || ""
   ).trim();
@@ -123,8 +127,11 @@ async function ensureNoteTextIndexed(note) {
     return;
   }
 
-  const embeddings =
-    await createEmbeddings(chunks);
+  budget.newChunks += chunks.length;
+  if (budget.newChunks > limits.MAX_NEW_CHUNKS) throw new AIError(413, "Too much new study material to index in one request. Retry to continue indexing.");
+  checkDeadline(budget.deadline);
+  const embeddings = await createEmbeddings(chunks);
+  checkDeadline(budget.deadline);
 
   note.ragChunks = chunks.map(
     (text, index) => ({
@@ -139,7 +146,7 @@ async function ensureNoteTextIndexed(note) {
   await note.save();
 }
 
-async function ensureAttachmentIndexed(note) {
+async function ensureAttachmentIndexed(note, budget) {
   if (!note.attachment?.url) {
     return;
   }
@@ -159,14 +166,17 @@ async function ensureAttachmentIndexed(note) {
     return;
   }
 
+  checkDeadline(budget.deadline);
   const extracted =
     await extractDocumentText({
       url: note.attachment.url,
+      attachment: note.attachment,
       format: note.attachment.format,
       originalName:
         note.attachment.originalName,
     });
 
+  checkDeadline(budget.deadline);
   if (!extracted.supported) {
     return;
   }
@@ -190,8 +200,11 @@ async function ensureAttachmentIndexed(note) {
     return;
   }
 
-  const embeddings =
-    await createEmbeddings(chunks);
+  budget.newChunks += chunks.length;
+  if (budget.newChunks > limits.MAX_NEW_CHUNKS) throw new AIError(413, "Too much new study material to index in one request. Retry to continue indexing.");
+  checkDeadline(budget.deadline);
+  const embeddings = await createEmbeddings(chunks);
+  checkDeadline(budget.deadline);
 
   note.attachmentRagChunks =
     chunks.map((text, index) => ({
@@ -210,6 +223,12 @@ async function ensureAttachmentIndexed(note) {
 }
 
 async function ensureNotesIndexed(userId) {
+  const budget = { newChunks: 0, deadline: Date.now() + limits.WORK_TIMEOUT_MS };
+  const oversized = await noteModel.findOne({ user: userId, $expr: { $or: [
+    { $gt: [{ $strLenCP: { $ifNull: ["$content", ""] } }, limits.MAX_TEXT_CHARS - limits.MAX_TITLE_CHARS - 2] },
+    { $gt: [{ $strLenCP: { $ifNull: ["$title", ""] } }, limits.MAX_TITLE_CHARS] },
+  ] } }).select("_id").maxTimeMS(5000).lean();
+  if (oversized) throw new AIError(413, "A study note exceeds the AI indexing limit. Shorten or split it first.");
   const notes = await noteModel
     .find({
       user: userId,
@@ -228,18 +247,26 @@ async function ensureNotesIndexed(userId) {
         },
       ],
     })
-    .select(
-      "+ragChunks " +
-        "+ragIndexedAt " +
-        "+attachmentRagChunks " +
-        "+attachmentRagIndexedAt " +
-        "+attachmentRagPublicId"
-    );
+    .select("user title content attachment +ragChunks +ragIndexedAt +attachmentRagChunks +attachmentRagIndexedAt +attachmentRagPublicId")
+    .slice("ragChunks", limits.MAX_CHUNKS_PER_SOURCE + 1)
+    .slice("attachmentRagChunks", limits.MAX_CHUNKS_PER_SOURCE + 1)
+    .limit(limits.MAX_NOTES + 1).maxTimeMS(5000);
+  if (notes.length > limits.MAX_NOTES) throw new AIError(413, "Study library exceeds the AI limit of 50 notes");
+  let storedChunks = 0;
+  for (const note of notes) {
+    for (const chunks of [note.ragChunks || [], note.attachmentRagChunks || []]) {
+      if (chunks.length > limits.MAX_CHUNKS_PER_SOURCE) throw new AIError(413, "Stored study source exceeds the chunk limit");
+      storedChunks += chunks.length;
+      if (chunks.some(chunk => typeof chunk.text !== "string" || chunk.text.length > CHUNK_SIZE || !Array.isArray(chunk.embedding) || chunk.embedding.length > limits.MAX_VECTOR_DIMENSIONS)) throw new AIError(413, "Stored study index exceeds the processing limits");
+    }
+  }
+  if (storedChunks > limits.MAX_RETRIEVAL_CHUNKS) throw new AIError(413, "Study library exceeds the retrieval workload limit");
 
   for (const note of notes) {
-    await ensureNoteTextIndexed(note);
+    checkDeadline(budget.deadline);
+    await ensureNoteTextIndexed(note, budget);
 
-    await ensureAttachmentIndexed(note);
+    await ensureAttachmentIndexed(note, budget);
   }
 }
 
@@ -247,6 +274,7 @@ async function retrieveRelevantNoteChunks({
   userId,
   question,
 }) {
+  requireText(question, 1000, "Question");
   const queryEmbedding =
     await createEmbedding(question);
 
@@ -274,13 +302,20 @@ async function retrieveRelevantNoteChunks({
         },
       ],
     })
-    .select(
-      "+ragChunks " +
-        "+ragIndexedAt " +
-        "+attachmentRagChunks " +
-        "+attachmentRagIndexedAt " +
-        "+attachmentRagPublicId"
-    );
+    .select("user title content attachment +ragChunks +ragIndexedAt +attachmentRagChunks +attachmentRagIndexedAt +attachmentRagPublicId")
+    .slice("ragChunks", limits.MAX_CHUNKS_PER_SOURCE + 1)
+    .slice("attachmentRagChunks", limits.MAX_CHUNKS_PER_SOURCE + 1)
+    .limit(limits.MAX_NOTES + 1).maxTimeMS(5000);
+  if (notes.length > limits.MAX_NOTES) throw new AIError(413, "Study library exceeds the AI limit of 50 notes");
+  let storedChunks = 0;
+  for (const note of notes) {
+    for (const chunks of [note.ragChunks || [], note.attachmentRagChunks || []]) {
+      if (chunks.length > limits.MAX_CHUNKS_PER_SOURCE) throw new AIError(413, "Stored study source exceeds the chunk limit");
+      storedChunks += chunks.length;
+      if (chunks.some(chunk => typeof chunk.text !== "string" || chunk.text.length > CHUNK_SIZE || !Array.isArray(chunk.embedding) || chunk.embedding.length > limits.MAX_VECTOR_DIMENSIONS)) throw new AIError(413, "Stored study index exceeds the processing limits");
+    }
+  }
+  if (storedChunks > limits.MAX_RETRIEVAL_CHUNKS) throw new AIError(413, "Study library exceeds the retrieval workload limit");
 
   const candidates = [];
 

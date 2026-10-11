@@ -1,3 +1,5 @@
+import { openAttachment } from "../../utils/openAttachment";
+import { API_BASE_URL } from "../../config/api";
 import { useEffect, useState } from "react";
 
 import Modal from "../ui/Modal";
@@ -14,7 +16,7 @@ import {
   X,
 } from "lucide-react";
 
-const AI_API_URL = "http://localhost:5000/api/ai";
+const AI_API_URL = `${API_BASE_URL}/api/ai`;
 
 function NoteCard({
   note,
@@ -185,22 +187,20 @@ function NoteCard({
               <p className="truncate text-sm font-medium text-slate-700 dark:text-slate-300">
                 {note.attachment.originalName ||
                   "Attachment"}
+                {(note.attachment.deliveryType || "upload") === "upload" && <span className="ml-1 text-xs text-amber-600 dark:text-amber-400">(legacy public)</span>}
               </p>
             </div>
 
-            <button
+            <div className="flex shrink-0 flex-wrap items-center gap-2">
+<button
               type="button"
-              onClick={() =>
-                window.open(
-                  note.attachment.url,
-                  "_blank",
-                  "noopener,noreferrer"
-                )
-              }
+              onClick={() => openAttachment("note", note)}
               className="btn-primary shrink-0 rounded-lg px-3 py-2 text-xs font-semibold transition"
             >
               View
             </button>
+                  <button type="button" onClick={() => openAttachment("note", note, true)} className="btn-primary shrink-0 rounded-lg px-3 py-2 text-xs font-semibold transition">Download</button>
+</div>
           </div>
         )}
 

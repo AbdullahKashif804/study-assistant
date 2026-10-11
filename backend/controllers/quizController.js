@@ -163,6 +163,17 @@ const updateQuiz = async (req,res) => {
                         message:"course not found or does not belong to you"
                     })
                 }
+        // An omitted score retains its previous value on update. Validate the
+        // retained score against the new total before applying the update.
+        if (obtainedMark === undefined) {
+            const existingQuiz = await quizModel.findOne({ _id: req.params.id, user: req.user._id });
+            if (!existingQuiz) {
+                return res.status(404).json({ success: false, message: "Quiz not found" });
+            }
+            if (existingQuiz.obtainedMark != null && existingQuiz.obtainedMark > totalMark) {
+                return res.status(400).json({ success: false, message: "Obtained marks cannot be greater than total marks" });
+            }
+        }
         const quiz = await quizModel.findOneAndUpdate({
             _id:req.params.id,
             user:req.user._id

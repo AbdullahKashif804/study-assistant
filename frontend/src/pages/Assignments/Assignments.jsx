@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import Pagination from "../../components/ui/Pagination";
 import useFormDraft from "../../hooks/useFormDraft";
 import {
@@ -16,7 +17,7 @@ import AssignmentForm from "../../components/assignments/AssignmentForm";
 import AssignmentList from "../../components/assignments/AssignmentList";
 import StatCard from "../../components/assignments/AssignmentStats";
 
-const API_URL = "http://localhost:5000/api/assignment";
+const API_URL = `${API_BASE_URL}/api/assignment`;
 
 const emptyForm = {
   title: "",
@@ -104,7 +105,7 @@ function Assignments() {
 
   async function fetchCourses() {
     try {
-      const response = await fetch("http://localhost:5000/api/course/get", {
+      const response = await fetch(`${API_BASE_URL}/api/course/get`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,

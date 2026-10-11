@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -10,7 +11,7 @@ import {
 } from "lucide-react";
 
 const AI_API_URL =
-  "http://localhost:5000/api/ai";
+  `${API_BASE_URL}/api/ai`;
 
 function StudyAgent() {
   const [

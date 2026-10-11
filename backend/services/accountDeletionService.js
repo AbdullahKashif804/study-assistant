@@ -12,7 +12,7 @@ const ownedModels = [
 const { deleteFromCloudinary } = require("../utils/cloudinaryDelete");
 
 function resourceKey(resource) {
-  return JSON.stringify([resource.resourceType, resource.publicId]);
+  return JSON.stringify([resource.resourceType, resource.publicId, resource.deliveryType || "upload"]);
 }
 
 async function collectResources(user, session) {
@@ -27,6 +27,7 @@ async function collectResources(user, session) {
     }
     const entry = {
       publicId: resource.publicId,
+      deliveryType: resource.deliveryType || "upload",
       resourceType: resource.resourceType || fallback,
     };
     resources.set(resourceKey(entry), entry);
@@ -58,7 +59,7 @@ async function deleteAccount(userId) {
 
   const resources = await collectResources(user);
   for (const resource of resources.values()) {
-    const result = await deleteFromCloudinary(resource.publicId, resource.resourceType);
+    const result = await deleteFromCloudinary(resource.publicId, resource.resourceType, { deliveryType: resource.deliveryType });
     // Already absent is safe on retries after a partial external cleanup.
     if (result?.result !== "ok" && result?.result !== "not found") {
       throw new Error("Cloudinary did not confirm file deletion");

@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import ModuleLayout, { ModuleColumns, ModuleRecords } from "../../components/ui/ModuleLayout";
 import Pagination from "../../components/ui/Pagination";
 import useFormDraft from "../../hooks/useFormDraft";
@@ -14,7 +15,7 @@ import CourseForm from "../../components/courses/CourseForm";
 import CourseList from "../../components/courses/CourseList";
 import StatCard from "../../components/courses/CourseStats";
 
-const API_URL = "http://localhost:5000/api/course";
+const API_URL = `${API_BASE_URL}/api/course`;
 
 const emptyForm = {
   title: "",
@@ -26,7 +27,7 @@ const emptyForm = {
 };
 
 async function fetchCurrentSemester(token) {
-  const response = await fetch("http://localhost:5000/api/user/profile", {
+  const response = await fetch(`${API_BASE_URL}/api/user/profile`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   const data = await response.json();

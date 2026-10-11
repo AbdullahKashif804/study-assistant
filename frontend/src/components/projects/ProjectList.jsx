@@ -1,3 +1,4 @@
+import { openAttachment } from "../../utils/openAttachment";
 import {
   MoreVertical,
   Pencil,
@@ -159,22 +160,20 @@ function ProjectList({
 
                     <p className="truncate text-sm font-medium text-slate-700 dark:text-slate-300">
                       {project.attachment.originalName || "Attachment"}
+                {(project.attachment.deliveryType || "upload") === "upload" && <span className="ml-1 text-xs text-amber-600 dark:text-amber-400">(legacy public)</span>}
                     </p>
                   </div>
 
-                  <button
+                  <div className="flex shrink-0 flex-wrap items-center gap-2">
+<button
                     type="button"
-                    onClick={() =>
-                      window.open(
-                        project.attachment.url,
-                        "_blank",
-                        "noopener,noreferrer"
-                      )
-                    }
+                    onClick={() => openAttachment("project", project)}
                     className="btn-primary shrink-0 rounded-lg px-3 py-2 text-xs font-semibold transition"
                   >
                     View
                   </button>
+                  <button type="button" onClick={() => openAttachment("project", project, true)} className="btn-primary shrink-0 rounded-lg px-3 py-2 text-xs font-semibold transition">Download</button>
+</div>
                 </div>
               )}
             </article>

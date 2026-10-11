@@ -1,9 +1,10 @@
+import { API_BASE_URL } from "../../config/api";
 
 import { useEffect, useRef, useState } from "react";
 import { Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const API_URL = "http://localhost:5000";
+const API_URL = API_BASE_URL;
 
 function GlobalSearch() {
     const [search, setSearch] = useState("");

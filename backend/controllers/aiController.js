@@ -1,3 +1,4 @@
+const { requireText, safeAIError } = require("../utils/aiSafety");
 const noteModel =
     require("../models/Notes");
 
@@ -68,6 +69,7 @@ const generateFromNote =
                     });
             }
 
+            requireText(content, MAX_NOTE_CHARACTERS, "Note content");
             const aiInput = {
                 title: note.title,
 
@@ -142,7 +144,8 @@ const generateFromNote =
                     data:
                         savedResult,
                 });
-        } catch (error) {
+        } catch (failure) {
+            const error = safeAIError(failure);
             return res
                 .status(
                     error.statusCode || 500
@@ -160,10 +163,7 @@ const generateFromNote =
 const askNotes =
     async (req, res) => {
         try {
-            const question =
-                String(
-                    req.body.question || ""
-                ).trim();
+            const question = requireText(req.body?.question, 1000, "Question");
 
             if (!question) {
                 return res
@@ -280,7 +280,8 @@ const askNotes =
                             uniqueSources,
                     },
                 });
-        } catch (error) {
+        } catch (failure) {
+            const error = safeAIError(failure);
             return res
                 .status(
                     error.statusCode || 500
@@ -298,10 +299,7 @@ const askNotes =
 const askStudyAgent =
     async (req, res) => {
         try {
-            const question =
-                String(
-                    req.body.question || ""
-                ).trim();
+            const question = requireText(req.body?.question, 1500, "Question");
 
             if (!question) {
                 return res
@@ -342,7 +340,8 @@ const askStudyAgent =
 
                     data: result,
                 });
-        } catch (error) {
+        } catch (failure) {
+            const error = safeAIError(failure);
             return res
                 .status(
                     error.statusCode || 500

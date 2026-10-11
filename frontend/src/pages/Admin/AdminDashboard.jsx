@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../config/api";
 import DashboardSidebar from "../../components/dashboard/DashboardSidebar";
 import DashboardHeader from "../../components/dashboard/DashboardHeader";
 import {
@@ -36,7 +37,7 @@ function AdminDashboard() {
 
       const token = localStorage.getItem("token");
 
-      const response = await fetch("http://localhost:5000/api/admin/stats", {
+      const response = await fetch(`${API_BASE_URL}/api/admin/stats`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
