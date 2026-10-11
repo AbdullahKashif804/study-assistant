@@ -133,17 +133,35 @@ async function ensureNoteTextIndexed(note, budget) {
   const embeddings = await createEmbeddings(chunks);
   checkDeadline(budget.deadline);
 
-  note.ragChunks = chunks.map(
-    (text, index) => ({
-      text,
-      embedding:
-        embeddings[index] || [],
-    })
-  );
+  const generatedChunks = chunks.map(
+  (text, index) => ({
+    text,
+    embedding: embeddings[index] || [],
+  })
+);
 
-  note.ragIndexedAt = new Date();
+const indexedAt = new Date();
 
-  await note.save();
+const result = await noteModel.updateOne(
+  {
+    _id: note._id,
+    user: note.user,
+    content: note.content,
+    title: note.title,
+    "ragChunks.0": { $exists: false },
+  },
+  {
+    $set: {
+      ragChunks: generatedChunks,
+      ragIndexedAt: indexedAt,
+    },
+  }
+);
+
+if (result.modifiedCount === 1) {
+  note.ragChunks = generatedChunks;
+  note.ragIndexedAt = indexedAt;
+}
 }
 
 async function ensureAttachmentIndexed(note, budget) {
@@ -182,16 +200,32 @@ async function ensureAttachmentIndexed(note, budget) {
   }
 
   if (!extracted.text) {
+  const indexedAt = new Date();
+
+  const result = await noteModel.updateOne(
+    {
+      _id: note._id,
+      user: note.user,
+      "attachment.publicId": currentPublicId,
+      "attachment.url": note.attachment.url,
+    },
+    {
+      $set: {
+        attachmentRagChunks: [],
+        attachmentRagIndexedAt: indexedAt,
+        attachmentRagPublicId: currentPublicId,
+      },
+    }
+  );
+
+  if (result.modifiedCount === 1) {
     note.attachmentRagChunks = [];
-    note.attachmentRagIndexedAt =
-      new Date();
-    note.attachmentRagPublicId =
-      currentPublicId;
-
-    await note.save();
-
-    return;
+    note.attachmentRagIndexedAt = indexedAt;
+    note.attachmentRagPublicId = currentPublicId;
   }
+
+  return;
+}
 
   const chunks =
     chunkText(extracted.text);
@@ -206,20 +240,36 @@ async function ensureAttachmentIndexed(note, budget) {
   const embeddings = await createEmbeddings(chunks);
   checkDeadline(budget.deadline);
 
-  note.attachmentRagChunks =
-    chunks.map((text, index) => ({
-      text,
-      embedding:
-        embeddings[index] || [],
-    }));
+  const generatedChunks = chunks.map(
+  (text, index) => ({
+    text,
+    embedding: embeddings[index] || [],
+  })
+);
 
-  note.attachmentRagIndexedAt =
-    new Date();
+const indexedAt = new Date();
 
-  note.attachmentRagPublicId =
-    currentPublicId;
+const result = await noteModel.updateOne(
+  {
+    _id: note._id,
+    user: note.user,
+    "attachment.publicId": currentPublicId,
+    "attachment.url": note.attachment.url,
+  },
+  {
+    $set: {
+      attachmentRagChunks: generatedChunks,
+      attachmentRagIndexedAt: indexedAt,
+      attachmentRagPublicId: currentPublicId,
+    },
+  }
+);
 
-  await note.save();
+if (result.modifiedCount === 1) {
+  note.attachmentRagChunks = generatedChunks;
+  note.attachmentRagIndexedAt = indexedAt;
+  note.attachmentRagPublicId = currentPublicId;
+}
 }
 
 async function ensureNotesIndexed(userId) {

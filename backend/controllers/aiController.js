@@ -145,6 +145,7 @@ const generateFromNote =
                         savedResult,
                 });
         } catch (failure) {
+           
             const error = safeAIError(failure);
             return res
                 .status(
@@ -281,6 +282,7 @@ const askNotes =
                     },
                 });
         } catch (failure) {
+            
             const error = safeAIError(failure);
             return res
                 .status(
@@ -341,6 +343,7 @@ const askStudyAgent =
                     data: result,
                 });
         } catch (failure) {
+            
             const error = safeAIError(failure);
             return res
                 .status(

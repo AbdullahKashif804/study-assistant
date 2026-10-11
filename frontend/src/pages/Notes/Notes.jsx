@@ -336,7 +336,9 @@ function Notes() {
                 courses={courses}
                 OpenCreateForm={OpenCreateForm}
             />
-
+            <div className="mt-6">
+    <NotesAI />
+</div>
             {error && (
                 <div className="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-400">
                     {error}
@@ -391,7 +393,7 @@ function Notes() {
                     />
                 </ModuleColumns>
             </div>
-            <div className="mt-6"><NotesAI /></div>
+            
         </ModuleLayout>
     );
 }

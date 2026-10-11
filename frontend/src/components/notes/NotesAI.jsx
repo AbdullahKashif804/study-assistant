@@ -1,5 +1,7 @@
 import { API_BASE_URL } from "../../config/api";
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 import {
   BrainCircuit,
@@ -225,9 +227,73 @@ function NotesAI() {
             </span>
           </div>
 
-          <p className="mt-4 whitespace-pre-wrap text-sm leading-7 text-slate-700 dark:text-slate-300">
-            {answer}
-          </p>
+          <div className="mt-4 min-w-0 overflow-hidden text-sm leading-7 text-slate-700 dark:text-slate-300">
+  <ReactMarkdown
+    remarkPlugins={[remarkGfm]}
+    components={{
+      h1: ({ children }) => (
+        <h1 className="mb-4 mt-5 text-xl font-bold text-slate-900 first:mt-0 dark:text-white">
+          {children}
+        </h1>
+      ),
+      h2: ({ children }) => (
+        <h2 className="mb-3 mt-5 text-lg font-bold text-indigo-700 first:mt-0 dark:text-indigo-300">
+          {children}
+        </h2>
+      ),
+      h3: ({ children }) => (
+        <h3 className="mb-2 mt-4 text-base font-semibold text-slate-900 first:mt-0 dark:text-slate-100">
+          {children}
+        </h3>
+      ),
+      p: ({ children }) => (
+        <p className="mb-3 leading-7 last:mb-0">{children}</p>
+      ),
+      strong: ({ children }) => (
+        <strong className="font-bold text-slate-900 dark:text-slate-100">
+          {children}
+        </strong>
+      ),
+      ul: ({ children }) => (
+        <ul className="mb-4 list-disc space-y-1 pl-6 marker:text-indigo-500">
+          {children}
+        </ul>
+      ),
+      ol: ({ children }) => (
+        <ol className="mb-4 list-decimal space-y-1 pl-6 marker:text-indigo-500">
+          {children}
+        </ol>
+      ),
+      li: ({ children }) => (
+        <li className="pl-1 leading-7">{children}</li>
+      ),
+      table: ({ children }) => (
+        <div className="my-4 w-full overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-700">
+          <table className="w-full min-w-max border-collapse text-left text-sm">
+            {children}
+          </table>
+        </div>
+      ),
+      th: ({ children }) => (
+        <th className="border-b border-r border-slate-200 px-4 py-3 font-semibold dark:border-slate-700">
+          {children}
+        </th>
+      ),
+      td: ({ children }) => (
+        <td className="border-b border-r border-slate-200 px-4 py-3 dark:border-slate-700">
+          {children}
+        </td>
+      ),
+      pre: ({ children }) => (
+        <pre className="my-4 overflow-x-auto rounded-xl bg-slate-100 p-4 text-xs dark:bg-slate-950">
+          {children}
+        </pre>
+      ),
+    }}
+  >
+    {answer}
+  </ReactMarkdown>
+</div>
 
           {sources.length >
             0 && (
