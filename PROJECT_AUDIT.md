@@ -4,6 +4,42 @@ Audit date: 2026-10-10. Scope: current working tree, including valuable uncommit
 
 Only this report was created. No application source, configuration, dependencies, environment files or database records were changed. Requested builds regenerated ignored `frontend/dist` output; registry commands may update npm's external cache. No backend server was started and no real account, upload or AI request was used for testing.
 
+## Follow-up status (2026-10-11)
+
+The original audit below is a **2026-10-10 historical baseline**, preserved with
+its finding IDs, evidence, recommendations and original line references. Its
+phrases such as "current tree", test counts, registry versions and "no cleanup
+implemented" describe that audit date, not today's implementation. Historical
+package advisories are not a freshly verified dependency-security assessment.
+
+| Area / original findings | Follow-up status | Current guide |
+| --- | --- | --- |
+| FE-1 / production API URL | Shared validated Vite base URL implemented; production HTTPS required | [Project setup](README.md#local-setup) |
+| DEPLOY-1 / MongoDB readiness | Awaited connection, 10-second selection timeout, sanitized failure and nonzero exit implemented | [Startup](docs/SECURITY.md#startup-and-password-hashing) |
+| SEC-1 / authentication abuse | Login/signup/OTP/resend limits implemented; process-local and proxy assumptions remain | [Authentication limits](docs/SECURITY.md#authentication-request-limits) |
+| SEC-2 / bcrypt | Cost 12 for new/changed passwords; old hashes compatible. Password-policy/session recommendations remain unresolved | [Password safeguards](docs/SECURITY.md#startup-and-password-hashing) |
+| BE-1?2 / SEC-3 input types | Numeric/semester/scalar write validation implemented. Query regex/pagination and normalization work remains | [Validation](docs/SECURITY.md#backend-input-validation-p1-issue-6) |
+| FILE-1?2 | Replacement sequencing/compensation and scoped temp cleanup implemented; orphan/retry/concurrency limitations remain | [Cloudinary operations](docs/CLOUDINARY.md) |
+| AI-1?2 / parts of AI-5?7 | Transport, document, token, indexing and concurrency limits implemented; failed model initialization resets and attachment downloads are constrained. Grounding/schema/concurrency and distributed-quota concerns remain | [AI guide](docs/AI.md) |
+| SEC-6 | New study attachments authenticated with owner-scoped streaming. Existing public exposure confirmed by user; legacy migration not executed | [Privacy and migration](docs/CLOUDINARY.md#attachment-privacy-and-legacy-migration) |
+| DEPLOY-2 / P1 Issue 3 | Production email API replacement deferred | [Pending security/deployment work](docs/SECURITY.md#unresolved-deployment-and-security-work) |
+| DEL-1?2 and other findings | Preserve original unresolved recommendations unless the guides explicitly document a mitigation | [Deletion recovery](docs/SECURITY.md#account-deletion-audit-and-recovery) |
+
+Evidence: the preceding secure-attachment implementation recorded 96 backend and
+19 frontend tests passing, frontend build success, and Oxlint with 20 existing
+warnings and no errors. These are prior task results, not tests rerun during this
+documentation consolidation. CLOUD-001 raw-PDF authenticated delivery and cleanup
+passed **according to the user**; no live cloud test was performed here. Browser,
+production integration and legacy migration verification remain outstanding.
+
+Documentation formerly located under backend/frontend has been consolidated into
+[Security](docs/SECURITY.md), [Cloudinary](docs/CLOUDINARY.md), [AI](docs/AI.md) and
+[Frontend](docs/FRONTEND.md). Original filenames mentioned as historical evidence
+below do not imply those old files still exist. Empty frontend README and repeated
+per-task file inventories were removed after preserving useful technical content.
+
+---
+
 ## 1. Executive summary
 
 The application has a coherent module structure, working production compilation, reusable frontend UI helpers, authenticated CRUD routes and explicit owner filters. Account deletion has meaningful transaction, failure and retry protections. These should be preserved.
@@ -121,8 +157,8 @@ Password guidance: [OWASP Password Storage Cheat Sheet](https://cheatsheetseries
 | FILE-1 / High / P1 | `userController.js:378–409`; `assignmentController.js:216–242`; equivalent note/project/course update paths | Old Cloudinary resource is deleted before upload and DB save succeed. Failure can leave a DB reference to a deleted file. Newly uploaded files can become orphaned if save fails. | Upload first, validate/save new metadata, then queue old-file cleanup; compensate new uploads on failure. High: external side effects and retries. | Confirmed sequencing; not fault-injected live. |
 | FILE-2 / Medium / P1 | Upload middleware runs before controller validation; `cloudinaryUpload.js` cleanup only runs when upload is called | Files reaching an early controller validation/not-found return never reach uploader cleanup and remain in local uploads. Repeated invalid uploads can consume disk. | Request-scoped finally/response cleanup for unconsumed temp files; test all early exits. Medium. | Confirmed code path; no real upload executed. |
 | FILE-3 / Medium / P2 | `cloudinaryDelete.js`; ordinary record/image delete handlers | Ordinary CRUD does not check Cloudinary's returned result before deleting/nulling the DB reference, unlike account deletion. No durable retry record exists. | Validate responses and preserve cleanup identifiers until confirmed/queued. Medium. | Confirmed difference. |
-| DEL-1 / High / P1 for multi-worker rollout | `accountDeletionService.js:50–83`; `authMiddleware.js:22–30`; `ACCOUNT_DELETION.md` | Pending flag blocks newly authenticated requests, not writes already past auth or background indexing. Final snapshot can miss late writes and leave user-owned records/resources after account deletion. | Coordinate/quiesce writes or make all writers participate in a durable deletion protocol; isolated concurrency tests first. High: cross-cutting write lifecycle. | Known documented limitation; race not reproduced. |
-| DEL-2 / Medium / P2 | `accountDeletionService.js:59–66`; `ACCOUNT_DELETION.md` retry instructions | Cloudinary is non-atomic with MongoDB. Partial file removal is irreversible; pending account needs manual retry; malformed legacy refs need trusted repair. No automatic recovery worker. | Preserve existing references/flag behavior; add operational retry/alert workflow before scale. Medium. | Confirmed design, not falsely reported as all-or-nothing external rollback. |
+| DEL-1 / High / P1 for multi-worker rollout | `accountDeletionService.js:50–83`; `authMiddleware.js:22–30`; [account-deletion guide](docs/SECURITY.md#account-deletion-audit-and-recovery) | Pending flag blocks newly authenticated requests, not writes already past auth or background indexing. Final snapshot can miss late writes and leave user-owned records/resources after account deletion. | Coordinate/quiesce writes or make all writers participate in a durable deletion protocol; isolated concurrency tests first. High: cross-cutting write lifecycle. | Known documented limitation; race not reproduced. |
+| DEL-2 / Medium / P2 | `accountDeletionService.js:59–66`; [account-deletion guide](docs/SECURITY.md#account-deletion-audit-and-recovery) retry instructions | Cloudinary is non-atomic with MongoDB. Partial file removal is irreversible; pending account needs manual retry; malformed legacy refs need trusted repair. No automatic recovery worker. | Preserve existing references/flag behavior; add operational retry/alert workflow before scale. Medium. | Confirmed design, not falsely reported as all-or-nothing external rollback. |
 
 Positive deletion findings: explicit server confirmation `DELETE`, identity from verified JWT only, seven owner collections plus matching PendingSignup covered, embedded note AI/RAG removed with Notes, resource types/deduplication checked, “not found” accepted idempotently, MongoDB deletions transactional, failed cleanup returns an error, deleted/pending users rejected from normal protected APIs. Transactions require a suitable replica set/sharded deployment; Atlas configuration was not contacted.
 

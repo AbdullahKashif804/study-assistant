@@ -1,479 +1,176 @@
 # Study Assistant
 
-A full-stack MERN-based study management application designed to help students organize their academic life in one place.
+A MERN study-management application for notes, assignments, projects, courses,
+quizzes, daily tasks and to-do tasks, with AI assistance and responsive light/dark UI.
 
-Study Assistant provides a centralized platform for managing notes, assignments, projects, courses, quizzes, daily tasks, and to-do tasks, with authentication, file attachments, email verification, search, filtering, notifications, dark mode, and admin management.
+## Documentation
+
+- [Security and backend safeguards](docs/SECURITY.md): authentication limits,
+  validation, password hashing, startup readiness and account-deletion recovery.
+- [Cloudinary operations](docs/CLOUDINARY.md): authenticated access, replacement,
+  temporary cleanup, diagnostics and legacy migration/recovery.
+- [AI features and limits](docs/AI.md): Summary, Quiz, RAG and Study Planner budgets.
+- [Frontend guide](docs/FRONTEND.md): shared layouts, colors, drafts and browser checks.
+- [Historical project audit](PROJECT_AUDIT.md): dated findings and separate follow-up status.
 
 ## Features
 
-### Authentication & User Management
+- Signup, login, JWT authentication, six-digit email verification, resend, password
+  change, profile management, profile images and explicitly confirmed account deletion.
+- Seven CRUD study modules, course relationships, assignment/project marks,
+  task completion, deadlines, search, filtering, sorting, result summaries and
+  pagination where supported. Profile semester defaults apply to new courses;
+  existing course semesters are preserved when the profile changes.
+- Notes AI summaries/quizzes, saved-result viewing, Ask Your Study Material with
+  document retrieval/embeddings, and AI Study Planner with read-only study tools.
+- Cloudinary PDF/DOCX/PPTX/JPEG/PNG/WEBP uploads, previews/downloads, replacement
+  and cleanup. New study files use authenticated delivery; **existing legacy
+  files remain public until migrated**. Profile images retain public delivery.
+- Dashboard overview, deadline reminders, in-app notifications and configurable
+  notification/theme preferences; Settings, Privacy Policy and Terms pages.
+- User/admin roles and an admin statistics dashboard. The backend exposes admin
+  statistics, not a full administrative user-management CRUD interface.
+- Shared forms/cards, navigation/sidebar, loading/error states, dark mode and
+  responsive layouts. See the frontend guide for outstanding browser verification.
 
-* User registration and login
-* JWT-based authentication
-* Email verification with a 6-digit verification code
-* Resend verification code
-* Secure password hashing with bcrypt
-* Change password
-* Profile management
-* Profile image upload
-* Account deletion
-* User and Admin roles
-* User-specific data isolation
+## Technology and structure
 
-### Study Management
-
-* Create, view, update, and delete notes
-* Create, view, update, and delete assignments
-* Create, view, update, and delete projects
-* Manage courses
-* Manage quizzes
-* Manage daily tasks
-* Manage to-do tasks
-* Assignment status management
-* Assignment marks tracking
-* Course references
-* Dashboard overview
-
-### Search & Organization
-
-* Global search
-* Module-specific search
-* Filtering
-* Sorting
-* Pagination
-* Result summaries
-* Course-based organization
-
-### File Attachments
-
-Cloudinary-powered file management for:
-
-* PDF
-* DOCX
-* PPTX
-* JPG/JPEG
-* PNG
-* WEBP
-
-Includes:
-
-* File upload
-* File viewing/downloading
-* File replacement
-* File deletion
-* File type validation
-* File size validation
-* Cloudinary asset cleanup
-
-### Notifications
-
-* Assignment and task deadline reminders
-* Configurable deadline notifications
-* In-app notification handling
-
-### Admin Panel
-
-Administrators can manage and monitor application data through a dedicated admin module.
-
-Includes:
-
-* User management
-* Academic data overview
-* Application statistics
-* Admin-only routes
-* Role-based access control
-
-### UI/UX
-
-* Responsive design
-* Desktop, tablet, and mobile support
-* Dark mode
-* Shared navigation system
-* Responsive sidebar
-* Consistent forms and cards
-* Loading states
-* Error handling
-* Responsive authentication pages
-* Responsive dashboard
-
-### Legal & Settings
-
-* Privacy Policy
-* Terms & Conditions
-* Account settings
-* Password management
-* Notification preferences
-* Theme preferences
-
----
-
-## Tech Stack
-
-### Frontend
-
-* React
-* Vite
-* Tailwind CSS
-* React Router
-* Fetch API
-* Lucide React
-
-### Backend
-
-* Node.js
-* Express.js
-* MongoDB
-* Mongoose
-* JWT
-* bcrypt
-* Multer
-* Nodemailer
-* Cloudinary
-* CORS
-* dotenv
-
-### Database & Services
-
-* MongoDB
-* Cloudinary
-* Gmail SMTP
-
----
-
-## Project Structure
+Frontend: React, Vite, Tailwind CSS, React Router, Fetch API and Lucide React.
+Backend: Node.js, Express, MongoDB/Mongoose, JWT, bcrypt, Multer, Cloudinary,
+Nodemailer, CORS and dotenv. AI uses Groq and local transformer embeddings.
+Gmail SMTP remains the current email transport; production replacement is deferred.
 
 ```text
 study-assistant/
-│
-├── backend/
-│   ├── config/
-│   ├── controllers/
-│   ├── middleware/
-│   ├── models/
-│   ├── routes/
-│   ├── utils/
-│   ├── uploads/
-│   ├── server.js
-│   └── .env
-│
-├── frontend/
-│   ├── public/
-│   └── src/
-│       ├── components/
-│       ├── context/
-│       ├── pages/
-│       ├── services/
-│       ├── App.jsx
-│       └── main.jsx
-│
-├── .gitignore
-├── package.json
-└── README.md
+  backend/
+    config/ controllers/ middleware/ models/ routes/ services/ utils/
+    scripts/ tests/ server.js
+    uploads/                  # ignored temporary uploads
+  frontend/
+    public/ src/ tests/
+  docs/
+    SECURITY.md CLOUDINARY.md AI.md FRONTEND.md
+  PROJECT_AUDIT.md
+  README.md
 ```
 
----
-
-## Main Modules
-
-The application contains the following major modules:
-
-* Home
-* Dashboard
-* Notes
-* Assignments
-* Projects
-* Courses
-* Quizzes
-* Daily Tasks
-* To-Do Tasks
-* Global Search
-* Profile
-* Settings
-* Admin Panel
-* Privacy Policy
-* Terms & Conditions
-
----
-
-## Authentication Flow
-
-The authentication system uses JWT tokens.
-
-```text
-Signup
-   ↓
-Email Verification
-   ↓
-User Account Created
-   ↓
-Login
-   ↓
-JWT Token
-   ↓
-Authenticated Application
-```
-
-Protected backend routes verify the JWT before allowing access to user data.
-
-Admin routes additionally verify the user's role.
-
----
-
-## File Upload Flow
-
-```text
-User selects file
-       ↓
-Frontend validation
-       ↓
-Multer middleware
-       ↓
-File type & size validation
-       ↓
-Cloudinary upload
-       ↓
-Metadata stored in MongoDB
-       ↓
-File available in application
-```
-
-When a file is replaced or deleted, the corresponding Cloudinary asset is also removed.
-
----
-
-## Security
-
-The application includes several security measures:
-
-* JWT authentication
-* Password hashing with bcrypt
-* Protected API routes
-* Role-based authorization
-* User data isolation
-* Environment variables for secrets
-* File type restrictions
-* File size restrictions
-* Cloudinary asset cleanup
-* Password excluded from profile queries
-* Generic production error responses
-* `.env` excluded from Git
-* Upload directory excluded from Git
-* Admin-only API access
-
----
-
-## Environment Variables
-
-Create a `.env` file inside the `backend` directory.
-
-Example:
-
-```env
-PORT=5000
-
-MONGO_URI=your_mongodb_connection_string
-
-JWT_SECRET=your_jwt_secret
-
-CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
-CLOUDINARY_API_KEY=your_cloudinary_api_key
-CLOUDINARY_API_SECRET=your_cloudinary_api_secret
-
-EMAIL_USER=your_email
-EMAIL_PASS=your_email_password
-```
-
-Never commit your `.env` file or expose your secret credentials publicly.
-
----
-
-## Installation
-
-### 1. Clone the repository
+## Local setup
 
 ```bash
 git clone https://github.com/AbdullahKashif804/study-assistant.git
-```
-
-### 2. Open the project
-
-```bash
 cd study-assistant
-```
-
-### 3. Install backend dependencies
-
-```bash
 cd backend
 npm install
 ```
 
-### 4. Configure backend environment variables
+Configure backend environment variables locally or through the host's secret
+settings. Names only are listed below; never commit actual values or put backend
+secrets in frontend Vite variables.
 
-Create:
+| Backend variable | Purpose |
+| --- | --- |
+| MONGODB_URL | MongoDB connection URI; transactions required for account deletion |
+| JWT_SECRET | JWT signing secret |
+| CLOUDINARY_CLOUD_NAME | Cloudinary product environment |
+| CLOUDINARY_API_KEY | Server-side Cloudinary API credential |
+| CLOUDINARY_API_SECRET | Server-side Cloudinary signing secret |
+| EMAIL_USER / EMAIL_PASS | Existing Gmail SMTP credentials |
+| GROQ_API_KEY | Server-side AI API credential |
+| PORT | HTTP port; defaults to 5000 |
 
-```text
-backend/.env
-```
+Backend dotenv configuration loads local `backend/.env`; this file must remain
+ignored. The old README's `MONGO_URI` name was incorrect; code uses `MONGODB_URL`.
+No environment file is supplied or changed by documentation consolidation.
 
-and add the required environment variables.
+Start the backend with `npm run dev`, or `npm start` for the normal server command.
+MongoDB must connect before HTTP listening begins; initial failure exits nonzero.
+Signup creates a pending verification record; successful verification creates the
+user; login issues a JWT. Protected APIs verify JWT/user existence and ownership,
+and admin statistics additionally require the admin role.
 
-### 5. Start the backend
-
-```bash
-npm run dev
-```
-
-or, depending on the project scripts:
-
-```bash
-node server.js
-```
-
-### 6. Install frontend dependencies
-
-Open another terminal:
+In a second terminal, from the project root:
 
 ```bash
 cd frontend
 npm install
-```
-
-### 7. Start the frontend
-
-```bash
 npm run dev
 ```
 
-The frontend will normally run on:
+Vite normally serves development at `http://localhost:5173`; the backend defaults
+to `http://localhost:5000`. Frontend `VITE_API_BASE_URL` is a public build-time
+backend origin. Whitespace/trailing slashes are normalized; credentials, paths,
+queries, fragments and non-HTTP(S) protocols are rejected. Development alone
+falls back to localhost when unset. Production requires an explicit HTTPS origin
+and never silently falls back to localhost. Set it before building for Render;
+rebuild after changing it. Do not put credentials in this variable.
 
-```text
-http://localhost:5173
+## Upload and deletion behavior
+
+Frontend validation is followed by authenticated Multer processing, request
+validation, Cloudinary upload and MongoDB metadata persistence. Ownership is
+checked before backend preview/download delivery. Replacement saves the new
+reference before old-file cleanup; scoped temporary cleanup handles success and
+failure. External cleanup can fail or become ambiguous; successful database
+updates do not guarantee all cloud cleanup completed. Follow the recovery
+instructions in the [Cloudinary guide](docs/CLOUDINARY.md) and
+[account-deletion guide](docs/SECURITY.md#account-deletion-audit-and-recovery).
+Do not run diagnostics or migrations without explicit authorization.
+
+## Checks and evidence
+
+From the repository root:
+
+```bash
+node --test backend/tests/*.test.js
+node --test frontend/tests/*.test.mjs
 ```
 
-The backend will normally run on:
+In `frontend`:
 
-```text
-http://localhost:5000
+```bash
+npm run build
+npm run lint
 ```
 
----
+The preceding attachment-security implementation recorded 96 backend tests and
+19 frontend tests passing, frontend build success and Oxlint with zero errors
+and 20 existing warnings. The bundle-size warning remains. These are recorded
+results from that task, not tests rerun during documentation consolidation.
+Most flow tests mock database/cloud/provider/browser behavior; bcrypt checks use
+synthetic passwords. The user separately reported CLOUD-001 live authenticated
+raw-PDF compatibility passed, including cleanup. No broader live integration or
+browser verification is implied.
 
-## Testing
+The former README claimed 150 successful functional cases and desktop/tablet/mobile
+verification. Those are historical claims without supporting artifacts in these
+guides; they are not current independently verified results. Use the documented
+manual checklists rather than treating them as release acceptance evidence.
 
-The application has been extensively tested across:
+## Deployment status and pending work
 
-* Authentication
-* Authorization
-* User data isolation
-* Admin access
-* CRUD operations
-* Search
-* Filtering
-* Pagination
-* File uploads
-* File deletion
-* Email verification
-* Password management
-* Settings
-* Dark mode
-* Responsive layouts
-* Mobile layouts
-* Tablet layouts
-* Desktop layouts
-* Console and network behavior
+Production preparation is ongoing. P1 API configuration, MongoDB readiness,
+authentication limits, bcrypt cost, validation, replacement safety, temporary
+cleanup, AI limits and new-attachment privacy are implemented. This is not a
+production security guarantee. Legacy-public migration and deployment/browser
+verification remain pending. Production email API replacement (P1 Issue 3) is
+deferred; do not assume Gmail SMTP works on Render Free.
 
-A total of **150 functional test cases** were completed successfully during project validation.
+Before rollout, configure backend/root directories, environment secrets, frontend
+build/dist publishing and SPA deep-link fallback, HTTPS/API origins and production
+CORS. Verify MongoDB transaction support, writable temporary storage, model
+cold-start/CPU/RAM, proxy trust, shutdown/readiness behavior, delivery quotas,
+logging/redaction and recovery with isolated resources. Never use real user data
+for destructive tests. The [audit follow-up](PROJECT_AUDIT.md#follow-up-status-2026-10-11)
+distinguishes completed fixes, partial mitigations and unresolved recommendations.
 
----
+Future opportunities include calendar integration, personalized/advanced analytics,
+additional notification channels and PWA support. AI summaries/quizzes/planning are
+already implemented, not future features.
 
-## Responsive Design
+## Author and use
 
-The application has been tested across:
+**Abdullah Kashif** ? BS Artificial Intelligence student and MERN Stack developer.
+[GitHub profile](https://github.com/AbdullahKashif804).
 
-* Desktop
-* Tablet
-* Mobile
-
-The interface includes responsive:
-
-* Navigation
-* Sidebar
-* Forms
-* Cards
-* Lists
-* Search
-* Pagination
-* Authentication pages
-* Dashboard
-* Admin panel
-
----
-
-## Current Status
-
-**Project Status: Production Preparation**
-
-Completed:
-
-* Full-stack MERN application
-* Authentication
-* Email verification
-* User management
-* Admin panel
-* Study modules
-* Search and filtering
-* Pagination
-* Cloudinary integration
-* Notifications
-* Settings
-* Dark mode
-* Responsive UI
-* Security review
-* Functional testing
-* UI/UX validation
-* Git/GitHub setup
-
-Next steps:
-
-* Production database setup
-* Backend deployment
-* Frontend deployment
-* Production environment configuration
-* Production CORS configuration
-* Final deployed application testing
-* Documentation and screenshots
-
----
-
-## Future Improvements
-
-Possible future improvements include:
-
-* AI-powered study recommendations
-* AI-generated summaries
-* AI quiz generation
-* AI study planning
-* Personalized learning analytics
-* Calendar integration
-* Advanced academic analytics
-* More notification channels
-* Progressive Web App support
-
----
-
-## Author
-
-**Abdullah Kashif**
-
-BS Artificial Intelligence Student
-MERN Stack Developer
-
-GitHub:
-https://github.com/AbdullahKashif804
-
----
-
-## License
-
-This project is developed for educational and portfolio purposes.
+Developed for educational and portfolio purposes. No additional license grant is
+introduced by this documentation update.

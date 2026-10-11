@@ -1,15 +1,15 @@
 # AI timeout and workload limits (P1 Issue 9)
 
-Inspection confirmed unlimited external request durations, unbounded document
+Historical inspection, before P1 Issue 9, confirmed unlimited external request durations, unbounded document
 downloads/extraction, all-library RAG indexing and embedding batches, raw provider
 error forwarding, and planner tool/context growth despite its six-step limit.
 Existing question lengths, 12,000-character summary input truncation, 1,200/200
 chunk size/overlap, top-five retrieval, and 30-record tool limits were present.
 
-Limits are centralized in config/aiLimits.js. Groq's existing
+Limits are centralized in `backend/config/aiLimits.js`. Groq's existing
 openai/gpt-oss-20b model and local Xenova/all-MiniLM-L6-v2 embedding model remain
-unchanged. No dependencies, schemas, credentials, provider prompts, or frontend
-files were changed.
+unchanged. The workload-limit fix preserved providers and prompts. Later attachment privacy
+work integrated authenticated document downloads without changing AI models.
 
 | Work | Limit |
 | --- | --- |
@@ -45,7 +45,7 @@ be terminated without blocking Express. Its heap limit does not cap all native,
 ArrayBuffer, or process memory; pathological documents still warrant stronger
 process isolation if public/untrusted usage grows. Concurrent extraction and the
 local embedding model need disposable Render memory/latency testing, especially
-on the Free plan. No real parser/provider performance was measured in this task.
+on the Free plan. No real parser/provider performance was measured in the original workload-limit task.
 
 Embedding inference receives bounded batches and yields between batches. Native
 inference and initial model downloads are not hard-cancelled; the cooperative
@@ -91,3 +91,20 @@ RAG with notes and supported attachments; planner recommendations and tools;
 loading/error messages for 413/429/504; owner isolation and retry behavior. Use
 disposable accounts/documents and a separately authorized test deployment for
 real provider/parser/Render verification. Production email delivery stays deferred.
+
+## Authenticated document retrieval
+
+Notes RAG now resolves authenticated attachment metadata server-side, using
+short-lived Cloudinary download URLs internally and rejecting redirects. Legacy
+public files retain a constrained compatibility path. Signed URLs are not returned
+to browsers. See [Cloudinary delivery and migration](CLOUDINARY.md).
+
+## Verification provenance
+
+The prior secure-attachment implementation recorded 96 backend and 19 frontend
+tests passing. AI tests mock provider fetches, workers, models and embedding
+initialization; authenticated RAG tests also mock Cloudinary delivery. Those
+results are not a new live AI/parser performance verification. Documentation
+consolidation does not rerun application tests or send real provider requests.
+
+[Project overview](../README.md) | [Historical audit](../PROJECT_AUDIT.md)

@@ -23,7 +23,15 @@ const PORT=process.env.PORT || 5000;
 // Re-verify the proxy chain before adding a CDN/proxy or another ingress path.
 app.set('trust proxy', process.env.RENDER === 'true' ? 1 : false)
 
-app.use(cors())
+const allowedOrigins = [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    process.env.FRONTEND_URL
+].filter(Boolean);
+
+app.use(cors({
+    origin: allowedOrigins
+}));
 app.use(express.json())
 
 app.get("/",(req,res)=>{
@@ -49,10 +57,11 @@ async function startServer() {
         app.listen(PORT,()=>{
             console.log(`Server is running on ${PORT}`)
         })
-    } catch {
-        console.error("Startup failed: unable to initialize the backend. Check MongoDB configuration and connectivity. HTTP server was not started.")
-        process.exit(1)
-    }
+    } catch (error) {
+    console.error("MongoDB connection error:", error.name);
+    console.error("Error message:", error.message);
+    process.exit(1);
+}
 }
 
 startServer()
