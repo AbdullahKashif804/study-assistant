@@ -63,6 +63,16 @@ const SignUp = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, BCRYPT_COST);
 
+    const existingPendingSignup = await pendingSignupModel.findOne({
+    email
+});
+
+if (existingPendingSignup) {
+    return res.status(409).json({
+        success: false,
+        message: "A signup is already pending for this email. Please verify your email or request a new verification code."
+    });
+}
     const verificationCode = generateVerificationCode();
 
     const verificationCodeExpiresAt = new Date(
