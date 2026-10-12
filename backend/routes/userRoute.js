@@ -7,6 +7,11 @@ const authMiddleware = require('../middleware/authMiddleware');
 const profileUploadMiddleware = require('../middleware/profileUploadMiddleware');
 const { createAuthRateLimiters } = require('../middleware/authRateLimit');
 const authLimits = createAuthRateLimiters();
+const passwordReset = require('../controllers/passwordResetController');
+
+router.post('/forgot-password', authLimits.requestPasswordReset, passwordReset.validatePasswordReset("request"), passwordReset.requestPasswordReset);
+router.post('/verify-reset-otp', authLimits.verifyPasswordReset, passwordReset.validatePasswordReset("verify"), passwordReset.verifyPasswordReset);
+router.post('/reset-password', authLimits.resetPassword, passwordReset.validatePasswordReset("reset"), passwordReset.resetPassword);
 
 
 router.post('/signup', authLimits.signUp, validateInput("signup"), userController.SignUp);

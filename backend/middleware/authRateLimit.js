@@ -87,6 +87,19 @@ function createAuthRateLimiters({ now = Date.now, maxEntries = 10000 } = {}) {
       rule("verify-email", 5, 10 * minute, emailKey),
     ]),
     resendVerification: middleware([rule("resend-ip", 10, 60 * minute, clientKey), ...deliveryRules]),
+    requestPasswordReset: middleware([
+      rule("reset-delivery-ip", 10, 60 * minute, clientKey),
+      rule("reset-delivery-email", 5, 60 * minute, emailKey),
+      rule("reset-cooldown", 1, minute, emailKey),
+    ]),
+    verifyPasswordReset: middleware([
+      rule("reset-verify-ip", 30, 10 * minute, clientKey),
+      rule("reset-verify-email", 5, 10 * minute, emailKey),
+    ]),
+    resetPassword: middleware([
+      rule("reset-submit-ip", 20, 15 * minute, clientKey),
+      rule("reset-submit-email", 10, 15 * minute, emailKey),
+    ]),
   };
 }
 

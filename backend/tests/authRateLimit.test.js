@@ -137,16 +137,21 @@ test("Express ignores forwarded spoofing locally and trusts only the nearest Ren
   }
 });
 
-test("only the four public authentication routes gain a limiter; protected routes keep their handlers", () => {
+test("public authentication and recovery routes are limited; protected routes keep their handlers", () => {
   const routes = [];
   const router = Object.fromEntries(["post", "get", "put", "delete"].map(method => [method, (...args) => routes.push({ method, args })]));
   const controller = new Proxy({}, { get: (_, name) => `controller:${name}` });
-  const limits = { signIn: "signin-limit", signUp: "signup-limit", verifyEmail: "verify-limit", resendVerification: "resend-limit" };
+  const limits = { signIn: "signin-limit", signUp: "signup-limit", verifyEmail: "verify-limit", resendVerification: "resend-limit",
+    requestPasswordReset: "reset-request-limit", verifyPasswordReset: "reset-verify-limit", resetPassword: "reset-limit" };
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, "../routes/userRoute.js"), "utf8"), {
     module: { exports: {} },
     require(name) {
       if (name === "express") return { Router: () => router };
       if (name.includes("userController")) return controller;
+      if (name.includes("passwordResetController")) return {
+        validatePasswordReset: action => `reset-validate:${action}`,
+        requestPasswordReset: "reset-request", verifyPasswordReset: "reset-verify", resetPassword: "reset",
+      };
       if (name.includes("validateInput")) return { validateInput: name => `validate:${name}` };
       if (name.includes("authRateLimit")) return { createAuthRateLimiters: () => limits };
       if (name.includes("profileUploadMiddleware")) return "upload";
@@ -155,6 +160,9 @@ test("only the four public authentication routes gain a limiter; protected route
     },
   });
   assert.deepEqual(routes.map(({ method, args }) => [method, ...args]), [
+    ["post", "/forgot-password", "reset-request-limit", "reset-validate:request", "reset-request"],
+    ["post", "/verify-reset-otp", "reset-verify-limit", "reset-validate:verify", "reset-verify"],
+    ["post", "/reset-password", "reset-limit", "reset-validate:reset", "reset"],
     ["post", "/signup", "signup-limit", "validate:signup", "controller:SignUp"],
     ["post", "/verify-email", "verify-limit", "validate:verifyEmail", "controller:VerifyEmail"],
     ["post", "/resend-verification", "resend-limit", "validate:resendVerification", "controller:ResendVerificationCode"],

@@ -1,5 +1,6 @@
 import Home from './pages/Home/Home';
 import Login from './pages/Auth/Login';
+import ForgotPassword from './pages/Auth/ForgotPassword';
 import Signup from './pages/Auth/Signup';
 import VerifyEmail from './pages/Auth/VerifyEmail'
 import {Routes,Route} from 'react-router-dom'
@@ -22,6 +23,7 @@ function App() {
     <Routes>
         <Route path="/" element={<Home/>}/>
         <Route path="/login" element={<Login/>}/>
+        <Route path="/forgot-password" element={<ForgotPassword/>}/>
         <Route path='/signup' element={<Signup/>}/>
         <Route path='/verify-email' element={<VerifyEmail/>}/>
         <Route path='/dashboard' element={<Dashboard/>}/>

@@ -53,6 +53,20 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
 
+    // Separate from signup verification; excluded from normal API queries.
+    passwordReset: {
+      type: new mongoose.Schema({
+        otpHash: String,
+        nonce: String,
+        tokenHash: String,
+        expiresAt: Date,
+        sentAt: Date,
+        attempts: { type: Number, default: 0 },
+      }, { _id: false }),
+      select: false,
+      default: undefined,
+    },
+
     currentSemester: {
       type: Number,
       required: true,

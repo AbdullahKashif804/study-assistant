@@ -108,6 +108,9 @@ navigate('/Dashboard');
                                     </button>
                                 </div>
                             </div>
+                            <Link to="/forgot-password" className="block text-right text-sm font-semibold text-blue-600 hover:underline dark:text-blue-400">
+                                Forgot Password?
+                            </Link>
                             <button
                                 type="submit"
                                 disabled={loading}
